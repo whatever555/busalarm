@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.alarm.emurph.alarmba.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:id="@+id/add_alarm"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+    </RelativeLayout>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:fillViewport="true">
+            <LinearLayout android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:text="My Alarms"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0.056"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.032" />
+
+                <TextView
+                    android:id="@+id/tv"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    />
+
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout0"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical">
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout1"
+                    android:layout_width="match_parent"
+                    android:layout_below="@id/layout0"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout2"
+                    android:layout_width="match_parent"
+                    android:layout_below="@id/layout1"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout3"
+                    android:layout_width="match_parent"
+                    android:layout_below="@id/layout2"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout4"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout5"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout6"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout7"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout8"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout9"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout10"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+                <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout11"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"/>
+
+
+            </LinearLayout>
+
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

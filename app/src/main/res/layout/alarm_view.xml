@@ -1,0 +1,96 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/addAlarmScreen"
+    android:background="#EEFFFFFF"
+    android:padding="0dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <!-- Row 1 with single column -->
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="center_horizontal">
+    </TableRow>
+    <!-- Row 2 with 2 columns -->
+    <TableRow
+        android:layout_height="wrap_content"
+        android:background="@color/buttonBack"
+        android:textColor="@color/buttonText"
+        android:layout_width="fill_parent">
+            <Button
+                android:id="@+id/editAlarm"
+                android:layout_width="fill_parent"
+                android:layout_gravity="left"
+                android:layout_height="@dimen/buttonHeight"
+                android:layout_weight="1"
+                android:layout_span="4"
+                android:background="@android:color/transparent"
+                tools:text="Edit" />
+
+            <Switch
+                android:id="@+id/simpleSwitch"
+                android:layout_width="wrap_content"
+                android:layout_span="1"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+
+
+    </TableRow>
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:text="Select Time"
+            android:layout_span="3"
+            />
+        <NumberPicker
+            android:id="@+id/hrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_span="1"
+            />
+        <NumberPicker
+            android:id="@+id/mins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_span="1"
+            />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="center_horizontal">
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="fill_parent"
+            android:layout_gravity="left"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_weight="1"
+            android:layout_span="4"
+            android:background="@color/removeButtonBack"
+            android:textColor="@color/removeButtonText"
+            tools:text="Cancel" />
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="fill_parent"
+            android:layout_gravity="left"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_weight="1"
+            android:layout_span="4"
+            android:background="@color/addButtonBack"
+            android:textColor="@color/addButtonText"
+            tools:text="Save" />
+    </TableRow>
+
+</TableLayout>

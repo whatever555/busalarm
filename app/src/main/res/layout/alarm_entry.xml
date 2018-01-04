@@ -1,0 +1,57 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:id="@+id/alarmView"
+    android:layout_below="@id/alarmView"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+
+    <!-- Row 1 with single column -->
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:text="Row 1"
+            android:layout_span="3"
+            android:id="@+id/alarmLabel"
+            android:textColor="#000"/>
+    </TableRow>
+    <!-- Row e with single column -->
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:text="Row 1"
+            android:layout_span="3"
+            android:id="@+id/timeDetails"
+            android:textColor="#000"/>
+    </TableRow>
+    <!-- Row 2 with 2 columns -->
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+
+        <TextView
+            android:text="Row 3 column 1"
+            android:layout_weight="1"
+            android:textColor="#000000"
+            android:id="@+id/stopNum" />
+
+        <TextView
+            android:text="Row 3 column 2"
+            android:layout_weight="1"
+            android:textColor="#000000"
+            android:id="@+id/buses"/>
+    </TableRow>
+
+</TableLayout>
