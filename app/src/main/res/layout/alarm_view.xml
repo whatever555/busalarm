@@ -8,15 +8,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 <TableLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#FDFDFF"
+    android:background="@color/primaryColor"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <!-- Row 1 with single column -->
     <TableRow
+        android:paddingTop="20dp"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:gravity="center_horizontal">
@@ -24,7 +23,6 @@
     <!-- Row 2 with 2 columns -->
     <TableRow
         android:layout_height="wrap_content"
-        android:background="@color/buttonBack"
         android:textColor="@color/buttonText"
         android:layout_width="fill_parent">
             <EditText
@@ -33,28 +31,41 @@
                 android:layout_height="@dimen/buttonHeight"
                 android:textSize="22sp"
                 android:padding="7dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:singleLine="true"
                 android:layout_span="12"
+                android:backgroundTint="@color/secondaryColor"
                 android:textColor="#777779"
-                android:background="#FEFEFF"
                 android:hint="Alarm name"
                 android:inputType="text">
             </EditText>
     </TableRow>
+</TableLayout>
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="60dp"
+    android:background="@color/secondaryColor"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="@dimen/buttonHeight"
         android:textSize="18sp"
-        android:padding="7dp"
         android:gravity="left"
         android:singleLine="true"
         android:layout_span="12"
         android:textColor="#777779"
-        android:background="#FEFEFF"
         android:text="Time"/>
     </TableRow>
+</TableLayout>
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/secondaryBack"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow
         android:layout_height="100dp"
         android:layout_width="fill_parent"
@@ -84,18 +95,36 @@
             android:gravity="center"
             android:layout_span="4"/>
     </TableRow>
+</TableLayout>
 
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="60dp"
+    android:background="@color/secondaryColor"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
-            android:padding="7dp"
+            android:gravity="left"
             android:singleLine="true"
-            android:layout_span="7"
+            android:layout_span="12"
             android:textColor="#777779"
-            android:background="#FEFEFF"
             android:text="Stop number:"/>
+    </TableRow>
+</TableLayout>
+
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primaryBack"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <TableRow>
 
         <EditText
             android:id="@+id/bus_stop_number"
@@ -104,7 +133,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:textColor="#777779"
-            android:background="#FEFEFF"
+            android:backgroundTint="@color/primaryColor"
             android:inputType="number"
             android:layout_span="4"
             android:layout_width="fill_parent"
@@ -113,44 +142,86 @@
         </EditText>
 
     </TableRow>
+</TableLayout>
 
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="60dp"
+    android:background="@color/secondaryColor"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
-            android:padding="7dp"
             android:gravity="left"
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:background="#FEFEFF"
-            android:text="Bus routes"/>
+            android:text="Bus routes:"/>
     </TableRow>
-    <TableRow
-        android:id="@+id/bus_list"
-        android:minHeight="40dp">
+</TableLayout>
+
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/secondaryBack"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <TableRow>
         <Spinner
-            android:id="@+id/bus_routes_list"
+            android:id="@+id/bus_routes_list1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_span="4"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dialog"/>
+
+            <Spinner
+            android:id="@+id/bus_routes_list2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="4"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dialog"/>
+
+            <Spinner
+            android:id="@+id/bus_routes_list3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_span="4"
             android:background="@android:drawable/btn_dropdown"
             android:spinnerMode="dialog"/>
     </TableRow>
+</TableLayout>
 
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="60dp"
+    android:background="@color/secondaryColor"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
-            android:padding="7dp"
             android:gravity="left"
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:background="#FEFEFF"
-            android:text="Repeat on days"/>
+            android:text="Repeat on days:"/>
     </TableRow>
+</TableLayout>
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/secondaryBack"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <com.dpro.widgets.WeekdaysPicker
             android:id="@+id/weekdays"
@@ -158,38 +229,46 @@
             android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            custom:highlight_color="#67ff67"
+            custom:highlight_color="@color/primaryColor"
             custom:background_color="#565657"
             custom:text_color="#111112"
             custom:sunday_first_day="false" />
     </TableRow>
 
-
     <TableRow
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
+        android:stretchColumns="*"
         android:gravity="center_horizontal">
         <Button
             android:id="@+id/cancel_button"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_gravity="left"
             android:layout_height="@dimen/buttonHeight"
-            android:layout_weight="1"
-            android:layout_span="6"
-            android:background="@color/removeButtonBack"
-            android:textColor="@color/removeButtonText"
+            android:layout_span="4"
+            android:background="@color/buttonBack"
+            android:textColor="@color/buttonText"
             android:text="Cancel" />
         <Button
-            android:id="@+id/save_button"
-            android:layout_width="fill_parent"
+            android:id="@+id/delete_button"
+            android:layout_width="match_parent"
             android:layout_gravity="right"
             android:layout_height="@dimen/buttonHeight"
-            android:layout_weight="1"
-            android:layout_span="6"
+            android:layout_span="4"
+            android:background="@color/removeButtonBack"
+            android:textColor="@color/removeButtonText"
+            android:text="Delete" />
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_gravity="right"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_span="4"
             android:background="@color/addButtonBack"
             android:textColor="@color/addButtonText"
             android:text="Save" />
     </TableRow>
+
 </TableLayout>
 </LinearLayout>
 </ScrollView>

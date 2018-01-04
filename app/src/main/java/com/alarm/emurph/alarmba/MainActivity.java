@@ -174,12 +174,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Selection of the spinner
-        Spinner spinner = (Spinner) customView.findViewById(R.id.bus_routes_list);
+        Spinner spinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+        Spinner spinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+        Spinner spinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
         // Application of the Array to the Spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this,   android.R.layout.simple_spinner_item, allBuses);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-        spinner.setAdapter(spinnerArrayAdapter);
+
+        spinner1.setAdapter(spinnerArrayAdapter);
+        spinner2.setAdapter(spinnerArrayAdapter);
+        spinner3.setAdapter(spinnerArrayAdapter);
 
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {

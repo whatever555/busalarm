@@ -4,6 +4,13 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="primaryBack">#E4E4E5</color>
+    <color name="secondaryBack">#EAEAF1</color>
+    <color name="tertiaryBack">#EEEEF1</color>
+
+    <color name="primaryColor">#7BB19C</color>
+    <color name="secondaryColor">#9BC1BC</color>
+
     <color name="baseTextColor">#666667</color>
 
     <color name="buttonText">#666667</color>
