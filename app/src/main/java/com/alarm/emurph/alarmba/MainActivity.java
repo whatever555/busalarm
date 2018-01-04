@@ -3,8 +3,8 @@ package com.alarm.emurph.alarmba;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,9 +14,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 
 import org.json.JSONArray;
@@ -30,12 +34,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
+
+    String[] allBuses = new String[]{
+            "1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
+            "15","15a","15b","15d","16","16c","17","17a","18","25",
+            "25a","25b","25d","25x","26","27","27a","27b","27x","29a",
+            "31","31a","31b","31d","32","32x","33","33a","33b","33d","33x",
+            "37","38","38a","38b","38d","39","39a","39x","40","40b","40d",
+            "41","41a","41b","41c","41x","42","42d","43","44","44b","45a","46a",
+            "46e","47","49","51d","51x","53","54a","56a","59","61","63","65","65b",
+            "66","66a","66b","66x","67","67x","68","68a","68x","69","69x","70","70d",
+            "75","76","76a","77a","77x","79","79a","83","83a","84","84a","84x",
+            "102","104","111","114","116","118","120","122","123","130","140",
+            "142","145","150","151","161","184","185","220","236","238","239",
+            "270","747","757"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         String FILENAME = "data.json";
         String string = "";
@@ -46,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -55,10 +76,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 addAlarmWindow();
-
             }
         });
 
@@ -66,14 +84,12 @@ public class MainActivity extends AppCompatActivity {
         // Layout inflater
         LayoutInflater layoutInflater;
 
-        System.out.println(jsonString);
         try {
             String alarmLabel;
             String start_time;
             String end_time;
             JSONArray buses;
             JSONArray stops;
-            System.out.println(jsonString);
             JSONArray array = new JSONArray(jsonString);
             for (int i = 0; i < array.length(); i++) {
 
@@ -120,13 +136,14 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
 
         // Inflate the custom layout/view
-        View customView = inflater.inflate(R.layout.alarm_view,null);
+        final View customView = inflater.inflate(R.layout.alarm_view,null);
 
         // Initialize a new instance of popup window
         final PopupWindow mPopupWindow = new PopupWindow(
                 customView,
-                LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT,
+                true
         );
 
         // Set an elevation value for popup window
@@ -138,6 +155,32 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
 
+        NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
+        NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
+
+        minsNumPick.setMinValue(0);
+        minsNumPick.setMaxValue(59);
+        hrsNumPick.setMinValue(0);
+        hrsNumPick.setMaxValue(12);
+
+        minsNumPick.setFormatter(new NumberPicker.Formatter() {
+            @Override
+            public String format(int i) {
+                return String.format("%02d", i);
+            }
+        });
+
+        EditText stopNumberText = (EditText) customView.findViewById(R.id.bus_stop_number);
+
+
+        // Selection of the spinner
+        Spinner spinner = (Spinner) customView.findViewById(R.id.bus_routes_list);
+
+        // Application of the Array to the Spinner
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this,   android.R.layout.simple_spinner_item, allBuses);
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+        spinner.setAdapter(spinnerArrayAdapter);
+
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,25 +190,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-                /*
-                    public void showAtLocation (View parent, int gravity, int x, int y)
-                        Display the content view in a popup window at the specified location. If the
-                        popup window cannot fit on screen, it will be clipped.
-                        Learn WindowManager.LayoutParams for more information on how gravity and the x
-                        and y parameters are related. Specifying a gravity of NO_GRAVITY is similar
-                        to specifying Gravity.LEFT | Gravity.TOP.
-
-                    Parameters
-                        parent : a parent view to get the getWindowToken() token from
-                        gravity : the gravity which controls the placement of the popup window
-                        x : the popup's x location offset
-                        y : the popup's y location offset
-                */
-        // Finally, show the popup window at the center location of root relative layout
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
-
     }
 
+    public void apiConnect(View view) {
+        try {
+            URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=65467&format=json");
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(
+                            busList.openStream()));
+
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null)
+                System.out.println(inputLine);
+
+            in.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
     public String readFromFile(String FILENAME) {
 
         String ret = "";
@@ -231,4 +276,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
