@@ -294,9 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 for (String day : selectedDays) {
                     selectedDaysInts.add(Integer.valueOf(day));
                 }
-
                 widget.setSelectedDays(selectedDaysInts);
-
             }
             catch(JSONException e){
             System.out.println(e.getMessage());
@@ -312,7 +310,6 @@ public class MainActivity extends AppCompatActivity {
     }
     public boolean saveAlarm(View customView, JSONObject row) {
         try{
-
             JSONObject jsonObject = new JSONObject();
 
             EditText name = (EditText) customView.findViewById(R.id.name);
@@ -364,6 +361,9 @@ public class MainActivity extends AppCompatActivity {
             jsonObject.put("selected_days", selectedDays);
 
             jsonArray.put(jsonObject);
+
+            Alarm alarm = new Alarm();
+            alarm.setAlarm(this);
 
             return writeToFile(FILENAME, jsonArray.toString());
 
