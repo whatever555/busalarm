@@ -120,8 +120,8 @@
             android:background="@color/buttonBack"
             android:textColor="@color/buttonText"
             android:height="25dp"
-            android:textOn="AM"
-            android:textOff="PM"
+            android:textOn="PM"
+            android:textOff="AM"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:layout_span="4"/>

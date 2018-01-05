@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,7 +43,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -93,13 +91,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadApp(){
+
+        LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
+
         jsonString = readFromFile(FILENAME);
 
         View view;
         // Layout inflater
         LayoutInflater layoutInflater;
         jsonArray = new JSONArray();
-        LinearLayout alarmListHolder = ((LinearLayout) findViewById(R.id.alarmListHolder));
 
         try {
             jsonArray = new JSONArray(jsonString);
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (saveAlarm(customView, rowToSend)) {
                     mPopupWindow.dismiss();
-                    reloadApp();
+                    loadApp();
                 }
             }
         });
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         if (deleteAlarm(idString)) {
                             mPopupWindow.dismiss();
-                            reloadApp();
+                            loadApp();
                         }
                     }
                 });
@@ -268,6 +268,9 @@ public class MainActivity extends AppCompatActivity {
                 name.setText(row.getString("name"));
                 minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
                 hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
+
+                ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
+                ampm.setChecked(row.getString("ampm").equals("PM"));
 
                 duration.setText(row.getString("duration"));
                 stopNumberText.setText(row.getString("stop_number"));
@@ -363,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final JSONObject row = jsonArray.getJSONObject(i);
-                if(idString == row.getString("idString"))
+                if(idString.equals(row.getString("idString")))
                 {
                     jsonArray.remove(i);
                     return writeToFile(FILENAME, jsonArray.toString());
