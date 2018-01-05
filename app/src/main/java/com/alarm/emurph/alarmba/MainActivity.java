@@ -43,6 +43,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -253,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 deleteButton.setBackgroundColor(Color.parseColor("#990000"));
-                final String idString = row.getString("idString");
+                final String idString = row.getString("id_string");
                 // Set a click listener for the popup window delete button
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -283,6 +285,17 @@ public class MainActivity extends AppCompatActivity {
                 routeSpinner2.setSelection(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r3"));
                 routeSpinner3.setSelection(spinnerPosition);
+
+                WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
+
+                List<String> selectedDays = Arrays.asList(row.getString("selected_days").split("\\s*,\\s*"));
+
+                List<Integer> selectedDaysInts = new ArrayList<>();
+                for (String day : selectedDays) {
+                    selectedDaysInts.add(Integer.valueOf(day));
+                }
+
+                widget.setSelectedDays(selectedDaysInts);
 
             }
             catch(JSONException e){
@@ -324,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
             routes.put("r3",route3);
 
             WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
-            List<String> selectedDaysList = widget.getSelectedDaysText();
+            List<Integer> selectedDaysList = widget.getSelectedDays();
 
             String selectedDays = TextUtils.join(",", selectedDaysList);
 
@@ -335,11 +348,11 @@ public class MainActivity extends AppCompatActivity {
                 idString = getRandomString();
             }
             else {
-                idString = row.getString("idString");
+                idString = row.getString("id_string");
                 deleteAlarm(idString);
             }
 
-            jsonObject.put("idString", idString);
+            jsonObject.put("id_string", idString);
             jsonObject.put("active", active);
             jsonObject.put("routes", routes);
             jsonObject.put("name", name.getText());
@@ -348,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
             jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
             jsonObject.put("duration", duration.getText());
             jsonObject.put("stop_number", stopNumberText.getText());
-            jsonObject.put("selectedDays", selectedDays);
+            jsonObject.put("selected_days", selectedDays);
 
             jsonArray.put(jsonObject);
 
@@ -366,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final JSONObject row = jsonArray.getJSONObject(i);
-                if(idString.equals(row.getString("idString")))
+                if(idString.equals(row.getString("id_string")))
                 {
                     jsonArray.remove(i);
                     return writeToFile(FILENAME, jsonArray.toString());
