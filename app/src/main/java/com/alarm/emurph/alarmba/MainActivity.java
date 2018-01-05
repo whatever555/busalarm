@@ -25,6 +25,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -48,6 +49,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    final int MAX_ALARMS = 25;
     String[] allBuses = new String[]{
             "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
             "15","15a","15b","15d","16","16c","17","17a","18","25",
@@ -96,10 +98,19 @@ public class MainActivity extends AppCompatActivity {
         // Layout inflater
         LayoutInflater layoutInflater;
         jsonArray = new JSONArray();
+        RelativeLayout alarmListHolder = ((RelativeLayout) findViewById(R.id.alarmListHolder));
+
         try {
             jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 // Parent layout
+                RelativeLayout relativeLayout = new RelativeLayout(this);
+                RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.FILL_PARENT,
+                        RelativeLayout.LayoutParams.FILL_PARENT);
+
+                alarmListHolder.addView(relativeLayout);
+
                 int resID = getResources().getIdentifier("layout"+i, "id", getPackageName());
                 RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
                 layoutInflater = getLayoutInflater();
@@ -114,12 +125,19 @@ public class MainActivity extends AppCompatActivity {
                 // In order to get the view we have to use the new view with text_layout in it
                 TableLayout alarmView = (TableLayout)view.findViewById(R.id.alarmView);
 
+                TableRow editAlarmTR = (TableRow)view.findViewById(R.id.editAlarmTR);
                 Button editButton = (Button)view.findViewById(R.id.editAlarm);
                 editButton.setText(name);
 
                 // Add the text view to the parent layout
                 parentLayout.addView(alarmView);
 
+                editAlarmTR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openAlarmWindow(row);
+                    }
+                });
                 editButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -248,8 +266,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
-
                 name.setText(row.getString("name"));
                 minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
                 hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
@@ -262,10 +278,9 @@ public class MainActivity extends AppCompatActivity {
                 int spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r1"));
                 routeSpinner1.setSelection(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r2"));
-                routeSpinner3.setSelection(spinnerPosition);
+                routeSpinner2.setSelection(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r3"));
                 routeSpinner3.setSelection(spinnerPosition);
-
 
             }
             catch(JSONException e){
@@ -298,8 +313,8 @@ public class MainActivity extends AppCompatActivity {
             Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
             String route1 = routeSpinner1.getSelectedItem().toString();
-            String route2 = routeSpinner1.getSelectedItem().toString();
-            String route3 = routeSpinner1.getSelectedItem().toString();
+            String route2 = routeSpinner2.getSelectedItem().toString();
+            String route3 = routeSpinner3.getSelectedItem().toString();
 
             JSONObject routes = new JSONObject();
             routes.put("r1",route1);

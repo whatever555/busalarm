@@ -34,79 +34,13 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.032" />
-
-                <TextView
-                    android:id="@+id/tv"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    />
-
                 <RelativeLayout
+                    android:id="@+id/alarmListHolder"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/layout0"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
                 </RelativeLayout>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout1"
-                    android:layout_width="match_parent"
-                    android:layout_below="@id/layout0"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout2"
-                    android:layout_width="match_parent"
-                    android:layout_below="@id/layout1"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout3"
-                    android:layout_width="match_parent"
-                    android:layout_below="@id/layout2"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout4"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout5"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout6"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout7"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout8"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout9"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout10"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-                <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:id="@+id/layout11"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"/>
-
-
             </LinearLayout>
 
     </ScrollView>

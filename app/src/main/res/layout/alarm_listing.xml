@@ -12,30 +12,32 @@
     <TableRow
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
+        android:layout_span="12"
         android:gravity="center_horizontal">
     </TableRow>
-    <!-- Row 2 with 2 columns -->
+    <!-- Row 2 with 12 columns -->
     <TableRow
+        android:id="@+id/editAlarmTR"
         android:layout_height="wrap_content"
         android:background="@color/buttonBack"
         android:textColor="@color/buttonText"
         android:layout_width="fill_parent">
-            <Button
-                android:id="@+id/editAlarm"
-                android:layout_width="fill_parent"
-                android:layout_gravity="left"
-                android:layout_height="@dimen/buttonHeight"
-                android:layout_weight="1"
-                android:layout_span="4"
-                android:background="@android:color/transparent"
-                tools:text="Edit" />
 
-            <Switch
-                android:id="@+id/simpleSwitch"
-                android:layout_width="wrap_content"
-                android:layout_span="1"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
+        <Button
+            android:id="@+id/editAlarm"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_gravity="left"
+            android:layout_span="12"
+            android:background="@android:color/transparent"
+            tools:text="Edit"></Button>
+
+        <Switch
+            android:id="@+id/simpleSwitch"
+            android:layout_width="wrap_content"
+            android:layout_span="4"
+            android:layout_height="wrap_content"
+            android:checked="true"/>
+
     </TableRow>
 
 </TableLayout>
