@@ -20,6 +20,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -98,21 +99,19 @@ public class MainActivity extends AppCompatActivity {
         // Layout inflater
         LayoutInflater layoutInflater;
         jsonArray = new JSONArray();
-        RelativeLayout alarmListHolder = ((RelativeLayout) findViewById(R.id.alarmListHolder));
+        LinearLayout alarmListHolder = ((LinearLayout) findViewById(R.id.alarmListHolder));
 
         try {
             jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 // Parent layout
-                RelativeLayout relativeLayout = new RelativeLayout(this);
+                RelativeLayout parentLayout = new RelativeLayout(this);
                 RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.FILL_PARENT,
-                        RelativeLayout.LayoutParams.FILL_PARENT);
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                parentLayout.setLayoutParams(rlp);
+                alarmListHolder.addView(parentLayout);
 
-                alarmListHolder.addView(relativeLayout);
-
-                int resID = getResources().getIdentifier("layout"+i, "id", getPackageName());
-                RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
                 layoutInflater = getLayoutInflater();
 
                 final JSONObject row = jsonArray.getJSONObject(i);
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     public void openAlarmWindow(JSONObject row) {
         Context mContext = this;
         // Parent layout
-        int resID = getResources().getIdentifier("add_alarm", "id", getPackageName());
+        int resID = getResources().getIdentifier("main_layout", "id", getPackageName());
         RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
         // Initialize a new instance of LayoutInflater service
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
