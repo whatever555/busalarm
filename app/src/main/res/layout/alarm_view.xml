@@ -209,7 +209,7 @@
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <EditText
-            android:id="@+id/bus_stop_number"
+            android:id="@+id/stop_number"
             android:textSize="22sp"
             android:padding="7dp"
             android:gravity="center"

@@ -166,10 +166,13 @@ public class MainActivity extends AppCompatActivity {
             mPopupWindow.setElevation(5.0f);
         }
 
+        EditText name = (EditText) customView.findViewById((R.id.name));
+
 
         NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
         NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
-        EditText alarmDuration = (EditText) customView.findViewById(R.id.alarm_duration);
+
+        EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
 
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
@@ -185,20 +188,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        EditText stopNumberText = (EditText) customView.findViewById(R.id.bus_stop_number);
+        EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
         // Selection of the spinner
-        Spinner spinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-        Spinner spinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-        Spinner spinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+        Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+        Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+        Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
         // Application of the Array to the Spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBuses);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
-        spinner1.setAdapter(spinnerArrayAdapter);
-        spinner2.setAdapter(spinnerArrayAdapter);
-        spinner3.setAdapter(spinnerArrayAdapter);
+        routeSpinner1.setAdapter(spinnerArrayAdapter);
+        routeSpinner2.setAdapter(spinnerArrayAdapter);
+        routeSpinner3.setAdapter(spinnerArrayAdapter);
 
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
@@ -215,24 +218,25 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view save button
         Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
+        final JSONObject rowToSend = row;
         // Set a click listener for the popup window save button
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (saveAlarm(customView)) {
+                if (saveAlarm(customView, rowToSend)) {
                     mPopupWindow.dismiss();
                     reloadApp();
                 }
             }
         });
 
-        // Get a reference for the custom view delete button
-        Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
-        try {
-            if(row!=null) {
+        if (row != null) {
+            // Get a reference for the custom view delete button
+            Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
+            try {
+
                 deleteButton.setBackgroundColor(Color.parseColor("#990000"));
                 final String idString = row.getString("idString");
-
                 // Set a click listener for the popup window delete button
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -243,12 +247,31 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+
+
+                name.setText(row.getString("name"));
+                minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
+                hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
+
+                duration.setText(row.getString("duration"));
+                stopNumberText.setText(row.getString("stop_number"));
+
+                JSONObject routes = row.getJSONObject("routes");
+
+                int spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r1"));
+                routeSpinner1.setSelection(spinnerPosition);
+                spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r2"));
+                routeSpinner3.setSelection(spinnerPosition);
+                spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r3"));
+                routeSpinner3.setSelection(spinnerPosition);
+
+
             }
-        }
-        catch (JSONException e) {
+            catch(JSONException e){
             System.out.println(e.getMessage());
         }
-
+    }
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
     }
 
@@ -257,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
         startActivity(intent);
     }
-    public boolean saveAlarm(View customView) {
+    public boolean saveAlarm(View customView, JSONObject row) {
         try{
 
             JSONObject jsonObject = new JSONObject();
@@ -267,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
             NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
             ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
             EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
-            EditText stopNumberText = (EditText) customView.findViewById(R.id.bus_stop_number);
+            EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
             // Selection of the spinner
             Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
@@ -289,7 +312,15 @@ public class MainActivity extends AppCompatActivity {
             String selectedDays = TextUtils.join(",", selectedDaysList);
 
             String active = "1";
-            String idString = getRandomString();
+
+            String idString;
+            if (row == null) {
+                idString = getRandomString();
+            }
+            else {
+                idString = row.getString("idString");
+                deleteAlarm(idString);
+            }
 
             jsonObject.put("idString", idString);
             jsonObject.put("active", active);
