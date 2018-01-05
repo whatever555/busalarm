@@ -3,14 +3,35 @@
     android:layout_height="match_parent"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:id="@+id/addAlarmScreen"
+    android:background="#ffffff"
     android:fillViewport="true">
     <LinearLayout android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 <TableLayout
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
+    android:padding="0dp"
     android:background="@color/primaryColor"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <TableRow>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:textSize="18sp"
+            android:gravity="left"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:height="46dp"
+            android:singleLine="true"
+            android:layout_span="12"
+            android:textColor="#777779"
+            android:text="Alarm Details"/>
+    </TableRow>
+</TableLayout>
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <!-- Row 1 with single column -->
@@ -26,7 +47,7 @@
         android:textColor="@color/buttonText"
         android:layout_width="fill_parent">
             <EditText
-                android:id="@+id/alarmViewHeading"
+                android:id="@+id/name"
                 android:layout_width="fill_parent"
                 android:layout_height="@dimen/buttonHeight"
                 android:textSize="22sp"
@@ -46,7 +67,7 @@
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="@color/secondaryColor"
-    android:padding="20dp"
+    android:padding="0dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
     <TextView
@@ -54,6 +75,9 @@
         android:layout_height="@dimen/buttonHeight"
         android:textSize="18sp"
         android:gravity="left"
+        android:paddingTop="20dp"
+        android:paddingLeft="20dp"
+        android:height="46dp"
         android:singleLine="true"
         android:layout_span="12"
         android:textColor="#777779"
@@ -63,7 +87,6 @@
 <TableLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/secondaryBack"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow
@@ -84,7 +107,7 @@
             android:layout_span="4"
             />
         <ToggleButton
-            android:id="@+id/togglebutton"
+            android:id="@+id/ampm"
             android:layout_width="wrap_content"
             android:background="@color/buttonBack"
             android:textColor="@color/buttonText"
@@ -102,7 +125,7 @@
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="@color/secondaryColor"
-    android:padding="20dp"
+    android:padding="0dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
@@ -110,10 +133,13 @@
             android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
             android:gravity="left"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:height="46dp"
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:text="Stop number:"/>
+            android:text="Alarm duration (minutes):"/>
     </TableRow>
 </TableLayout>
 
@@ -121,11 +147,67 @@
 <TableLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primaryBack"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
 
+        <EditText
+            android:id="@+id/alarm_duration"
+            android:textSize="22sp"
+            android:padding="7dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#777779"
+            android:backgroundTint="@color/primaryColor"
+            android:inputType="number"
+            android:layout_span="4"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="15">
+        </EditText>
+
+        <TextView
+            android:textSize="1sp"
+            android:gravity="left"
+            android:height="46dp"
+            android:layout_span="8"
+            android:singleLine="true"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textColor="#777779"
+            android:text="minutes:"/>
+
+    </TableRow>
+</TableLayout>
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="60dp"
+    android:background="@color/secondaryColor"
+    android:padding="0dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <TableRow>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:textSize="18sp"
+            android:gravity="left"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:height="46dp"
+            android:singleLine="true"
+            android:layout_span="12"
+            android:textColor="#777779"
+            android:text="Stop number:"/>
+    </TableRow>
+</TableLayout>
+
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
+    <TableRow>
         <EditText
             android:id="@+id/bus_stop_number"
             android:textSize="22sp"
@@ -140,7 +222,16 @@
             android:layout_height="fill_parent"
             android:text="10">
         </EditText>
-
+        <TextView
+            android:textSize="1sp"
+            android:gravity="left"
+            android:height="46dp"
+            android:layout_span="8"
+            android:singleLine="true"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textColor="#777779"
+            android:text=" "/>
     </TableRow>
 </TableLayout>
 
@@ -149,7 +240,7 @@
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="@color/secondaryColor"
-    android:padding="20dp"
+    android:padding="0dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
@@ -157,10 +248,13 @@
             android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
             android:gravity="left"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:height="46dp"
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:text="Bus routes:"/>
+            android:text="Bus route(s):"/>
     </TableRow>
 </TableLayout>
 
@@ -168,7 +262,6 @@
 <TableLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/secondaryBack"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
@@ -202,7 +295,7 @@
     android:layout_width="fill_parent"
     android:layout_height="60dp"
     android:background="@color/secondaryColor"
-    android:padding="20dp"
+    android:padding="0dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
@@ -210,16 +303,19 @@
             android:layout_height="@dimen/buttonHeight"
             android:textSize="18sp"
             android:gravity="left"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:height="46dp"
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
             android:text="Repeat on days:"/>
     </TableRow>
 </TableLayout>
+
 <TableLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/secondaryBack"
     android:padding="20dp"
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
@@ -229,12 +325,18 @@
             android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            custom:highlight_color="@color/primaryColor"
+            custom:highlight_color="@color/positiveGreen"
             custom:background_color="#565657"
             custom:text_color="#111112"
             custom:sunday_first_day="false" />
     </TableRow>
-
+</TableLayout>
+<TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/secondaryColor"
+    android:padding="20dp"
+    android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"

@@ -7,6 +7,7 @@ import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,6 +23,9 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.ToggleButton;
+
+import com.dpro.widgets.WeekdaysPicker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,11 +39,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     String[] allBuses = new String[]{
-            "1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
+            "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
             "15","15a","15b","15d","16","16c","17","17a","18","25",
             "25a","25b","25d","25x","26","27","27a","27b","27x","29a",
             "31","31a","31b","31d","32","32x","33","33a","33b","33d","33x",
@@ -53,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
             "270","747","757"
     };
 
+    String FILENAME;
+
+    JSONArray jsonArray;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,54 +72,39 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        String FILENAME = "data.json";
-        String string = "";
-
-        writeToFile(FILENAME, "[{\"label\":\"Everyday Alarm\",\"days_string\":\"MON,TUE,WED,THU,FRI\", \"start_time\":\"1:00\",\"end_time\":\"1:15\",\"buses\":[\"14\",\"15\"],\"stops\":[\"667\"]},{\"label\":\"Weekend Alarm\", \"start_time\":\"2:00\",\"days_string\":\"SAT,SUN\",\"end_time\":\"1:15\",\"buses\":[\"14\",\"15\"],\"stops\":[\"667\"]}]");
-
-        String jsonString = readFromFile(FILENAME);
-
+        FILENAME = "data.json";
         setContentView(R.layout.activity_main);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addAlarmWindow();
+                openAlarmWindow(null);
             }
         });
+
+        loadApp();
+    }
+
+    public void loadApp(){
+
+        String jsonString = readFromFile(FILENAME);
 
         View view;
         // Layout inflater
         LayoutInflater layoutInflater;
-
+        jsonArray = new JSONArray();
         try {
-            String alarmLabel;
-            String start_time;
-            String end_time;
-            JSONArray buses;
-            JSONArray stops;
-            JSONArray array = new JSONArray(jsonString);
-            for (int i = 0; i < array.length(); i++) {
-
+            jsonArray = new JSONArray(jsonString);
+            for (int i = 0; i < jsonArray.length(); i++) {
                 // Parent layout
                 int resID = getResources().getIdentifier("layout"+i, "id", getPackageName());
                 RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
-
                 layoutInflater = getLayoutInflater();
-                System.out.println("LOOPING");
-                JSONObject row = array.getJSONObject(i);
-                start_time = row.getString("start_time");
-                end_time = row.getString("end_time");
-                alarmLabel = row.getString("label");
-                String daysString = row.getString("days_string");
-                buses = new JSONArray(row.getString("buses"));
-                stops = new JSONArray(row.getString("stops"));
 
-                System.out.println("start_time" + start_time);
+                final JSONObject row = jsonArray.getJSONObject(i);
+
+                String name = row.getString("name");
+
                 // Add the text layout to the parent layout
                 view = layoutInflater.inflate(R.layout.alarm_listing, parentLayout, false);
 
@@ -115,19 +112,33 @@ public class MainActivity extends AppCompatActivity {
                 TableLayout alarmView = (TableLayout)view.findViewById(R.id.alarmView);
 
                 Button editButton = (Button)view.findViewById(R.id.editAlarm);
-                editButton.setText(alarmLabel);
+                editButton.setText(name);
 
                 // Add the text view to the parent layout
                 parentLayout.addView(alarmView);
+
+                editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openAlarmWindow(row);
+                    }
+                });
             }
         }
         catch (JSONException e) {
 
         }
     }
+    public String getRandomString() {
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+
+        return generatedString;
+    }
 
 
-    public void addAlarmWindow() {
+    public void openAlarmWindow(JSONObject jo) {
         Context mContext = this;
         // Parent layout
         int resID = getResources().getIdentifier("add_alarm", "id", getPackageName());
@@ -152,16 +163,17 @@ public class MainActivity extends AppCompatActivity {
             mPopupWindow.setElevation(5.0f);
         }
 
-        // Get a reference for the custom view close button
-        Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
 
         NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
         NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
+        EditText alarmDuration = (EditText) customView.findViewById(R.id.alarm_duration);
 
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
         hrsNumPick.setMinValue(0);
         hrsNumPick.setMaxValue(12);
+        hrsNumPick.setValue(7);
+        minsNumPick.setValue(30);
 
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
             @Override
@@ -171,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         EditText stopNumberText = (EditText) customView.findViewById(R.id.bus_stop_number);
-
 
         // Selection of the spinner
         Spinner spinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
@@ -186,6 +197,9 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setAdapter(spinnerArrayAdapter);
         spinner3.setAdapter(spinnerArrayAdapter);
 
+        // Get a reference for the custom view close button
+        Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
+
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,7 +209,93 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Get a reference for the custom view save button
+        Button saveButton = (Button) customView.findViewById(R.id.save_button);
+
+        // Set a click listener for the popup window save button
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (saveAlarm(customView)) {
+                    mPopupWindow.dismiss();
+                    loadApp();
+                }
+            }
+        });
+
+        // Get a reference for the custom view delete button
+        Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
+
+        // Set a click listener for the popup window delete button
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (deleteAlarm(customView)) {
+                    mPopupWindow.dismiss();
+                    loadApp();
+                }
+            }
+        });
+
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
+    }
+
+    public boolean saveAlarm(View customView) {
+        try{
+
+            JSONObject jsonObject = new JSONObject();
+
+            EditText name = (EditText) customView.findViewById(R.id.name);
+            NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
+            NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
+            ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
+            EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
+            EditText stopNumberText = (EditText) customView.findViewById(R.id.bus_stop_number);
+
+            // Selection of the spinner
+            Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+            Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+            Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+
+            String route1 = routeSpinner1.getSelectedItem().toString();
+            String route2 = routeSpinner1.getSelectedItem().toString();
+            String route3 = routeSpinner1.getSelectedItem().toString();
+
+            JSONObject routes = new JSONObject();
+
+            WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
+            List<String> selectedDaysList = widget.getSelectedDaysText();
+
+            String selectedDays = TextUtils.join(",", selectedDaysList);
+
+            String active = "1";
+            String idString = getRandomString();
+
+            jsonObject.put("idString", idString);
+            jsonObject.put("active", active);
+            jsonObject.put("routes", routes);
+            jsonObject.put("name", name.getText());
+            jsonObject.put("hrs", hrsNumPick.getValue());
+            jsonObject.put("mins", minsNumPick.getValue());
+            jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
+            jsonObject.put("duration", duration.getText());
+            jsonObject.put("stop_number", stopNumberText.getText());
+            jsonObject.put("selectedDays", selectedDays);
+
+            jsonArray.put(jsonObject);
+
+            return writeToFile(FILENAME, jsonArray.toString());
+
+        }
+        catch (JSONException e) {
+            return false;
+        }
+    }
+
+
+    public boolean deleteAlarm(View customView) {
+
+        return false;
     }
 
     public void apiConnect(View view) {
@@ -247,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
         return ret;
     }
 
-    public void writeToFile(String FILENAME, String data) {
+    public boolean writeToFile(String FILENAME, String data) {
         try {
             FileOutputStream fou = openFileOutput(FILENAME, MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fou);
@@ -256,7 +356,9 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
+            return false;
         }
+        return true;
     }
 
 
