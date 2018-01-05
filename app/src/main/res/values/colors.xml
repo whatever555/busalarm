@@ -27,8 +27,8 @@
     <color name="editButtonText">#EFEFFF</color>
     <color name="editButtonBack">#5555EF</color>
 
-
-
+    <color name="inactiveButtonText">#F1F1FF</color>
+    <color name="inactiveButtonBack">#AAAAEF</color>
 
     <color name="positiveGreen">#43CC43</color>
 </resources>

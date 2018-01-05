@@ -1,6 +1,8 @@
 package com.alarm.emurph.alarmba;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             "270","747","757"
     };
 
+    String jsonString;
     String FILENAME;
 
     JSONArray jsonArray;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         FILENAME = "data.json";
+
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -86,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadApp(){
-
-        String jsonString = readFromFile(FILENAME);
+        jsonString = readFromFile(FILENAME);
 
         View view;
         // Layout inflater
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         catch (JSONException e) {
-
+            System.out.println(e.getMessage());
         }
     }
     public String getRandomString() {
@@ -138,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void openAlarmWindow(JSONObject jo) {
+    public void openAlarmWindow(JSONObject row) {
         Context mContext = this;
         // Parent layout
         int resID = getResources().getIdentifier("add_alarm", "id", getPackageName());
@@ -147,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
 
         // Inflate the custom layout/view
-        final View customView = inflater.inflate(R.layout.alarm_view,null);
+        final View customView = inflater.inflate(R.layout.alarm_view, null);
 
         // Initialize a new instance of popup window
         final PopupWindow mPopupWindow = new PopupWindow(
@@ -159,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set an elevation value for popup window
         // Call requires API level 21
-        if(Build.VERSION.SDK_INT>=21){
+        if (Build.VERSION.SDK_INT >= 21) {
             mPopupWindow.setElevation(5.0f);
         }
 
@@ -190,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         Spinner spinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
         // Application of the Array to the Spinner
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this,   android.R.layout.simple_spinner_item, allBuses);
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBuses);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
         spinner1.setAdapter(spinnerArrayAdapter);
@@ -218,28 +221,42 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (saveAlarm(customView)) {
                     mPopupWindow.dismiss();
-                    loadApp();
+                    reloadApp();
                 }
             }
         });
 
         // Get a reference for the custom view delete button
         Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
+        try {
+            if(row!=null) {
+                deleteButton.setBackgroundColor(Color.parseColor("#990000"));
+                final String idString = row.getString("idString");
 
-        // Set a click listener for the popup window delete button
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (deleteAlarm(customView)) {
-                    mPopupWindow.dismiss();
-                    loadApp();
-                }
+                // Set a click listener for the popup window delete button
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (deleteAlarm(idString)) {
+                            mPopupWindow.dismiss();
+                            reloadApp();
+                        }
+                    }
+                });
             }
-        });
+        }
+        catch (JSONException e) {
+            System.out.println(e.getMessage());
+        }
 
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
     }
 
+    public void reloadApp(){
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
     public boolean saveAlarm(View customView) {
         try{
 
@@ -262,6 +279,9 @@ public class MainActivity extends AppCompatActivity {
             String route3 = routeSpinner1.getSelectedItem().toString();
 
             JSONObject routes = new JSONObject();
+            routes.put("r1",route1);
+            routes.put("r2",route2);
+            routes.put("r3",route3);
 
             WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
             List<String> selectedDaysList = widget.getSelectedDaysText();
@@ -288,12 +308,27 @@ public class MainActivity extends AppCompatActivity {
 
         }
         catch (JSONException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
 
 
-    public boolean deleteAlarm(View customView) {
+    public boolean deleteAlarm(String idString) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                final JSONObject row = jsonArray.getJSONObject(i);
+                if(idString == row.getString("idString"))
+                {
+                    jsonArray.remove(i);
+                    return writeToFile(FILENAME, jsonArray.toString());
+
+                }
+            }
+            catch (JSONException e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
         return false;
     }

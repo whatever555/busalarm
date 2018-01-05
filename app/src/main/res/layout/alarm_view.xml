@@ -357,8 +357,8 @@
             android:layout_gravity="right"
             android:layout_height="@dimen/buttonHeight"
             android:layout_span="4"
-            android:background="@color/removeButtonBack"
-            android:textColor="@color/removeButtonText"
+            android:background="@color/inactiveButtonBack"
+            android:textColor="@color/inactiveButtonText"
             android:text="Delete" />
         <Button
             android:id="@+id/save_button"
