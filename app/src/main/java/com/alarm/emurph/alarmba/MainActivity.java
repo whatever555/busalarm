@@ -9,7 +9,6 @@ import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,23 +33,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    final int MAX_ALARMS = 25;
     String[] allBuses = new String[]{
             "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
             "15","15a","15b","15d","16","16c","17","17a","18","25",
@@ -66,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             "270","747","757"
     };
 
+    AlarmData alarmData;
     String jsonString;
-    String FILENAME;
 
     JSONArray jsonArray;
 
@@ -75,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        alarmData = new AlarmData();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
-        FILENAME = "data.json";
 
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -88,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 openAlarmWindow(null);
             }
         });
-
         loadApp();
     }
 
@@ -96,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
 
-        jsonString = readFromFile(FILENAME);
+        jsonString = alarmData.readFromFile(this);
 
         View view;
         // Layout inflater
@@ -151,12 +138,12 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getMessage());
         }
     }
-    public String getRandomString() {
-        byte[] array = new byte[7]; // length is bounded by 7
-        new Random().nextBytes(array);
-        String generatedString = new String(array, Charset.forName("UTF-8"));
 
-        return generatedString;
+
+
+
+    public int getCurrentTimestamp(){
+        return  (int) (new Date().getTime()/1000);
     }
 
 
@@ -255,12 +242,12 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 deleteButton.setBackgroundColor(Color.parseColor("#990000"));
-                final String idString = row.getString("id_string");
+                final int alarmId = Integer.parseInt(row.getString("alarm_id"));
                 // Set a click listener for the popup window delete button
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (deleteAlarm(idString)) {
+                        if (deleteAlarm(alarmId)) {
                             mPopupWindow.dismiss();
                             loadApp();
                         }
@@ -273,6 +260,9 @@ public class MainActivity extends AppCompatActivity {
 
                 ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
                 ampm.setChecked(row.getString("ampm").equals("PM"));
+
+                ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
+                repeatToggle.setChecked(row.getString("repeat_toggle").equals("No"));
 
                 duration.setText(row.getString("duration"));
                 stopNumberText.setText(row.getString("stop_number"));
@@ -316,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
             NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
             NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
             ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
+            ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
             EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
             EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
@@ -340,32 +331,35 @@ public class MainActivity extends AppCompatActivity {
 
             String active = "1";
 
-            String idString;
+            int alarmId;
             if (row == null) {
-                idString = getRandomString();
+                alarmId = getCurrentTimestamp();
             }
             else {
-                idString = row.getString("id_string");
-                deleteAlarm(idString);
+                alarmId = Integer.parseInt(row.getString("alarm_id"));
+                deleteAlarm(alarmId);
             }
 
-            jsonObject.put("id_string", idString);
+            jsonObject.put("alarm_id", Integer.toString(alarmId));
             jsonObject.put("active", active);
             jsonObject.put("routes", routes);
             jsonObject.put("name", name.getText());
             jsonObject.put("hrs", hrsNumPick.getValue());
             jsonObject.put("mins", minsNumPick.getValue());
             jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
+            jsonObject.put("repeat_toggle", repeatToggle.isChecked() ? repeatToggle.getTextOn() : repeatToggle.getTextOff());
             jsonObject.put("duration", duration.getText());
             jsonObject.put("stop_number", stopNumberText.getText());
             jsonObject.put("selected_days", selectedDays);
 
+            String nameStr = name.getText().toString();
             jsonArray.put(jsonObject);
 
             Alarm alarm = new Alarm();
-            alarm.setAlarm(this);
 
-            return writeToFile(FILENAME, jsonArray.toString());
+            alarm.setAlarm(this, alarmId, nameStr);
+
+            return alarmData.writeToFile(this, jsonArray.toString());
 
         }
         catch (JSONException e) {
@@ -375,14 +369,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public boolean deleteAlarm(String idString) {
+    public boolean deleteAlarm(int alarmId) {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final JSONObject row = jsonArray.getJSONObject(i);
-                if(idString.equals(row.getString("id_string")))
+                if(Integer.toString(alarmId).equals(row.getString("alarm_id")))
                 {
                     jsonArray.remove(i);
-                    return writeToFile(FILENAME, jsonArray.toString());
+                    return alarmData.writeToFile(this, jsonArray.toString());
 
                 }
             }
@@ -394,68 +388,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void apiConnect(View view) {
-        try {
-            URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=65467&format=json");
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            busList.openStream()));
-
-            String inputLine;
-
-            while ((inputLine = in.readLine()) != null)
-                System.out.println(inputLine);
-
-            in.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-    public String readFromFile(String FILENAME) {
-
-        String ret = "";
-
-        try {
-            InputStream inputStream = openFileInput(FILENAME);
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
-    }
-
-    public boolean writeToFile(String FILENAME, String data) {
-        try {
-            FileOutputStream fou = openFileOutput(FILENAME, MODE_PRIVATE);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fou);
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-            return false;
-        }
-        return true;
-    }
 
 
     @Override

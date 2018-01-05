@@ -317,7 +317,7 @@
                 android:singleLine="true"
                 android:layout_span="12"
                 android:textColor="#777779"
-                android:text="Repeat on days:"/>
+                android:text="Set days:"/>
         </TableRow>
     </TableLayout>
 
@@ -339,6 +339,39 @@
                 custom:sunday_first_day="false" />
         </TableRow>
     </TableLayout>
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:shrinkColumns="*"  android:stretchColumns="*">
+            <TableRow
+                android:layout_height="100dp"
+                android:layout_width="fill_parent"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="6"
+                    android:textSize="20dp"
+                    android:text="Repeat weekly:"
+                    />
+
+                <ToggleButton
+                    android:id="@+id/repeat_toggle"
+                    android:layout_width="wrap_content"
+                    android:background="@color/buttonBack"
+                    android:textColor="@color/buttonText"
+                    android:height="25dp"
+                    android:textOn="No"
+                    android:textOff="Yes"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:layout_span="6"/>
+            </TableRow>
+        </TableLayout>
+
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -380,6 +413,9 @@
         </TableRow>
 
     </TableLayout>
+
+
+
     </LinearLayout>
     </ScrollView>
 </RelativeLayout>
