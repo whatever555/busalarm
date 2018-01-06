@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.os.StrictMode;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
 
@@ -44,6 +47,7 @@ public class Alarm extends BroadcastReceiver
 
         if (requestCode == 0)
         {
+            sendNotification(context,"request 0 ");
             cancelAlarm(context, 0, name);
             sendNotification(context, "Cancelling alarm");
         }else{
@@ -60,6 +64,7 @@ public class Alarm extends BroadcastReceiver
                     }
                 }
                 if(currentAlarmData == null){
+                    sendNotification(context,"null data 0 ");
                     cancelAlarm(context, requestCode, name);
                 }else{
                     Date now = new Date();
@@ -68,7 +73,7 @@ public class Alarm extends BroadcastReceiver
                     calendar.setTime(now);
                     int currentDayInt = calendar.get(Calendar.DAY_OF_WEEK);
 
-                    if (currentAlarmData.getString("selected_days").indexOf(Integer.toString(currentDayInt)) > -1)
+                    if (currentAlarmData.getString("selected_days").contains(Integer.toString(currentDayInt)))
                     {
                         int hrs = Integer.parseInt(currentAlarmData.getString("hrs"));
                         int mins = Integer.parseInt(currentAlarmData.getString("mins"));
@@ -82,7 +87,7 @@ public class Alarm extends BroadcastReceiver
 
                         int calendarTime = (nowHour * 60) + nowMinute;
 
-                        if ((alarmTime + duration) < calendarTime && alarmTime > calendarTime) {
+                        if (alarmTime < calendarTime + duration && alarmTime >= calendarTime) {
 
                             JSONObject routes = currentAlarmData.getJSONObject("routes");
 
@@ -90,22 +95,31 @@ public class Alarm extends BroadcastReceiver
                             String route2 = routes.getString("r2");
                             String route3 = routes.getString("r3");
 
-                            String jsonBusString = getStopInfo(currentAlarmData.getString("stop_number"));
-
-                            System.out.println(jsonBusString);
-
                             try {
+                                String jsonBusString = getStopInfo(currentAlarmData.getString("stop_number"));
 
-                                JSONArray busArray = new JSONArray(jsonBusString);
+                                try {
+                                    JSONArray busArray = new JSONArray(jsonBusString);
+                                    JSONArray stopData = busArray.getJSONArray(5);
 
-
-                                for (int i = 0; i < busArray.length(); i++) {
+                                    for (int i = 0; i < stopData.length(); i++) {
+                                        final JSONObject row = stopData.getJSONObject(i);
+                                        String busRoute = row.getString("result");
+                                        if (!(busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3)))
+                                        {
+                                            break;
+                                        }
+                                        if (row.getString("duetime").equals("5")) {
+                                            sendNotification(context, busRoute + " arriving to stop " + currentAlarmData.getString("stop_number") + "in 5 mins");
+                                        }
+                                    }
+                                }catch(JSONException e){
 
                                 }
-                            }catch(JSONException e){
+                            }
+                            catch (Exception e) {
 
                             }
-
                         }
                         else {
                             cancelAlarm(context, requestCode, name);
@@ -123,14 +137,43 @@ public class Alarm extends BroadcastReceiver
 
 
 
-    public void setAlarm(Context context, int requestCode, String name)
+    public void setAlarm(Context context, int requestCode, String name, int hrs, int mins)
     {
+
+        Calendar calendar = new GregorianCalendar();
+        Calendar calendar2 = new GregorianCalendar();
+
+        Date date = new Date();
+        date.setTime(System.currentTimeMillis() + (60 * 60 * 1000));
+        calendar.setTime(date);
+        calendar2.setTime(date);
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar2.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hrs);
+        calendar.set(Calendar.MINUTE, mins);
+
+        System.out.println("KKKKK: "+calendar.getTime()+ "   "+calendar2.getTime());
+
+        System.out.println("HHHH: "+calendar.getTimeInMillis()+ "   "+calendar2.getTimeInMillis());
+        if (calendar.getTimeInMillis() < calendar2.getTimeInMillis() - 1000) {
+            calendar.add(Calendar.DATE, 1);
+        }
+        System.out.println("HHHH: "+calendar.getTimeInMillis()+ "   "+calendar2.getTimeInMillis());
+
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
         Intent i = new Intent(context, Alarm.class);
         i.putExtra("requestCode", requestCode);
+        i.putExtra("hrs", hrs);
+        i.putExtra("mins", mins);
         i.putExtra("name", name);
-        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_CANCEL_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 30, pi); // Millisec * Second * Minute
+        System.out.println("about to set it");
+// calendar.getTimeInMillis()
+        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 30, pi); // Millisec * Second * Minute
+
+        System.out.println("finihsed set it");
     }
 
     public void cancelAlarm(Context context, int requestCode, String name)
@@ -139,7 +182,6 @@ public class Alarm extends BroadcastReceiver
         PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
-        sendNotification(context, "Alarm cancelled" + name);
     }
 
     public void sendNotification(Context context, String message) {
@@ -158,6 +200,8 @@ public class Alarm extends BroadcastReceiver
 
 
     public String getStopInfo(String stopId) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         try {
             String retStr = "";
             URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid="+stopId+"&format=json");

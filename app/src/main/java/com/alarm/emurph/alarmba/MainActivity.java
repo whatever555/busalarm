@@ -9,6 +9,7 @@ import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +28,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.ToggleButton;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Calendar;
 import com.dpro.widgets.WeekdaysPicker;
 
 import org.json.JSONArray;
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println("OPENEND");
         alarmData = new AlarmData();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 openAlarmWindow(null);
             }
         });
+
         loadApp();
     }
 
@@ -84,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
 
         jsonString = alarmData.readFromFile(this);
+
+        String stops = getStopInfo("677");
 
         View view;
         // Layout inflater
@@ -140,11 +150,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     public int getCurrentTimestamp(){
         return  (int) (new Date().getTime()/1000);
     }
+
 
 
     public void openAlarmWindow(JSONObject row) {
@@ -183,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
         hrsNumPick.setMinValue(0);
-        hrsNumPick.setMaxValue(12);
+        hrsNumPick.setMaxValue(11);
         hrsNumPick.setValue(7);
         minsNumPick.setValue(30);
 
@@ -293,6 +302,32 @@ public class MainActivity extends AppCompatActivity {
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
     }
 
+
+    public String getStopInfo(String stopId) {
+        System.out.println("LOADING STOPNS");
+        try {
+            String retStr = "";
+            URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid="+stopId+"&format=json");
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(
+                            busList.openStream()));
+
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null)
+                retStr+=inputLine;
+
+            in.close();
+
+            System.out.println(retStr);
+            return retStr;
+        } catch (IOException e) {
+
+            System.out.println("LOADING fucked up");
+            throw new RuntimeException(e);
+        }
+    }
+
     public void reloadApp(){
         Intent intent = getIntent();
         finish();
@@ -355,9 +390,15 @@ public class MainActivity extends AppCompatActivity {
             String nameStr = name.getText().toString();
             jsonArray.put(jsonObject);
 
+            int hrs = hrsNumPick.getValue();
+
+            if (ampm.isChecked()) {
+                hrs+=12;
+            }
+
             Alarm alarm = new Alarm();
 
-            alarm.setAlarm(this, alarmId, nameStr);
+            alarm.setAlarm(this, alarmId, nameStr, hrs, minsNumPick.getValue());
 
             return alarmData.writeToFile(this, jsonArray.toString());
 
