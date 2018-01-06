@@ -10,6 +10,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.os.StrictMode;
 
@@ -18,8 +19,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
@@ -98,6 +106,7 @@ public class Alarm extends BroadcastReceiver
                             try {
                                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                                 StrictMode.setThreadPolicy(policy);
+
                                 String stopNumber = currentAlarmData.getString("stop_number");
 
                                 String jsonBusString = getStopInfo(stopNumber);
@@ -105,7 +114,6 @@ public class Alarm extends BroadcastReceiver
                                 try {
                                     JSONObject busArray = new JSONObject(jsonBusString);
                                     JSONArray stopDataArray = busArray.getJSONArray("results");
-
 
                                     for (int i = 0; i < stopDataArray.length(); i++) {
                                         final JSONObject row = stopDataArray.getJSONObject(i);
@@ -220,4 +228,92 @@ public class Alarm extends BroadcastReceiver
             throw new RuntimeException(e);
         }
     }
-}
+
+
+    private class readFromFile extends AsyncTask<String, Integer, String > {
+
+        // static String FILENAME = "test.txt";
+        HttpURLConnection conn;
+        URL url;
+        String urlString;
+        Context context;
+        int READ_TIMEOUT = 12;
+        int CONNECTION_TIMEOUT = 12;
+
+
+        public readFromFile(Context context, String urlString) {
+            super();
+            this.context = context;
+            this.urlString = urlString;
+        }
+
+        @Override
+        protected String doInBackground(String... str) {
+            try {
+                // Enter URL address where your php file resides
+                url = new URL(urlString);
+
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return e.toString();
+            }
+            try {
+
+                // Setup HttpURLConnection class to send and receive data from php
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("GET");
+
+                // setDoOutput to true as we recieve data from json file
+                conn.setDoOutput(true);
+
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return e1.toString();
+            }
+
+            try {
+
+                int response_code = conn.getResponseCode();
+
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
+
+                    // Read data sent from server
+                    InputStream input = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    // Pass data to onPostExecute method
+                    return (result.toString());
+
+                } else {
+
+                    return ("unsuccessful");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return e.toString();
+            } finally {
+                conn.disconnect();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            sendNotification("What the hell");
+            //content.setText(sb.toString());
+        }
+
+    }
