@@ -87,7 +87,7 @@ public class Alarm extends BroadcastReceiver
 
                         int calendarTime = (nowHour * 60) + nowMinute;
 
-                        if (alarmTime < calendarTime + duration && alarmTime >= calendarTime) {
+                        if (calendarTime < alarmTime + duration && calendarTime >= alarmTime) {
 
                             JSONObject routes = currentAlarmData.getJSONObject("routes");
 
@@ -96,33 +96,46 @@ public class Alarm extends BroadcastReceiver
                             String route3 = routes.getString("r3");
 
                             try {
-                                String jsonBusString = getStopInfo(currentAlarmData.getString("stop_number"));
+                                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                                StrictMode.setThreadPolicy(policy);
+                                String stopNumber = currentAlarmData.getString("stop_number");
+
+                                String jsonBusString = getStopInfo(stopNumber);
 
                                 try {
-                                    JSONArray busArray = new JSONArray(jsonBusString);
-                                    JSONArray stopData = busArray.getJSONArray(5);
+                                    JSONObject busArray = new JSONObject(jsonBusString);
+                                    JSONArray stopDataArray = busArray.getJSONArray("results");
 
-                                    for (int i = 0; i < stopData.length(); i++) {
-                                        final JSONObject row = stopData.getJSONObject(i);
-                                        String busRoute = row.getString("result");
-                                        if (!(busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3)))
+
+                                    for (int i = 0; i < stopDataArray.length(); i++) {
+                                        final JSONObject row = stopDataArray.getJSONObject(i);
+
+                                        String busRoute = row.getString("route");
+                                        int duetime = Integer.parseInt(row.getString("duetime"));
+                                        int notificaionPrelay = Integer.parseInt(currentAlarmData.getString("notificaiont_prelay"));
+
+                                        boolean allRoutes = route1.equals(route2) && route2.equals(route3) && route3.equals("select");
+                                        if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3)))
                                         {
-                                            break;
-                                        }
-                                        if (row.getString("duetime").equals("5")) {
-                                            sendNotification(context, busRoute + " arriving to stop " + currentAlarmData.getString("stop_number") + "in 5 mins");
+                                            if (duetime == notificaionPrelay) {
+                                                sendNotification(context, busRoute + " arriving to stop " + stopNumber + "in " +notificaionPrelay+ " mins");
+                                            }
                                         }
                                     }
                                 }catch(JSONException e){
+                                    sendNotification(context, " fucked up in 5 mins");
 
                                 }
                             }
                             catch (Exception e) {
 
+                                sendNotification(context, " fucked up inmores");
                             }
                         }
                         else {
+                            sendNotification(context, " CANCELLINGs");
                             cancelAlarm(context, requestCode, name);
+                            // TODO RESET ALARM IF REPEAT IS ON
                         }
 
                     }
@@ -131,15 +144,12 @@ public class Alarm extends BroadcastReceiver
             catch (JSONException e) {}
         }
 
-        System.out.println();
         wl.release();
     }
 
 
-
     public void setAlarm(Context context, int requestCode, String name, int hrs, int mins)
     {
-
         Calendar calendar = new GregorianCalendar();
         Calendar calendar2 = new GregorianCalendar();
 
@@ -153,13 +163,9 @@ public class Alarm extends BroadcastReceiver
         calendar.set(Calendar.HOUR_OF_DAY, hrs);
         calendar.set(Calendar.MINUTE, mins);
 
-        System.out.println("KKKKK: "+calendar.getTime()+ "   "+calendar2.getTime());
-
-        System.out.println("HHHH: "+calendar.getTimeInMillis()+ "   "+calendar2.getTimeInMillis());
         if (calendar.getTimeInMillis() < calendar2.getTimeInMillis() - 1000) {
             calendar.add(Calendar.DATE, 1);
         }
-        System.out.println("HHHH: "+calendar.getTimeInMillis()+ "   "+calendar2.getTimeInMillis());
 
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
@@ -168,12 +174,9 @@ public class Alarm extends BroadcastReceiver
         i.putExtra("hrs", hrs);
         i.putExtra("mins", mins);
         i.putExtra("name", name);
-        System.out.println("about to set it");
-// calendar.getTimeInMillis()
-        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 30, pi); // Millisec * Second * Minute
 
-        System.out.println("finihsed set it");
+        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 11, pi); // Millisec * Second * Minute
     }
 
     public void cancelAlarm(Context context, int requestCode, String name)
@@ -195,13 +198,10 @@ public class Alarm extends BroadcastReceiver
                 .flags(Notification.DEFAULT_ALL)
                 .simple()
                 .build();
-
     }
 
 
     public String getStopInfo(String stopId) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
         try {
             String retStr = "";
             URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid="+stopId+"&format=json");
@@ -217,7 +217,6 @@ public class Alarm extends BroadcastReceiver
             in.close();
             return retStr;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }

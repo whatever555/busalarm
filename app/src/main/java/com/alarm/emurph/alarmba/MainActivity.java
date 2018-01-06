@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,8 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("OPENEND");
         alarmData = new AlarmData();
+        System.out.println("OPENEND2");
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        System.out.println("OPENEND3");
 
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -92,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
 
         jsonString = alarmData.readFromFile(this);
-
-        String stops = getStopInfo("677");
 
         View view;
         // Layout inflater
@@ -188,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
 
         EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
+        EditText notificationPrelay = (EditText) customView.findViewById(R.id.notification_prelay);
 
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
@@ -274,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
                 repeatToggle.setChecked(row.getString("repeat_toggle").equals("No"));
 
                 duration.setText(row.getString("duration"));
+                notificationPrelay.setText(row.getString("notification_prelay"));
                 stopNumberText.setText(row.getString("stop_number"));
 
                 JSONObject routes = row.getJSONObject("routes");
@@ -302,32 +305,6 @@ public class MainActivity extends AppCompatActivity {
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
     }
 
-
-    public String getStopInfo(String stopId) {
-        System.out.println("LOADING STOPNS");
-        try {
-            String retStr = "";
-            URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid="+stopId+"&format=json");
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            busList.openStream()));
-
-            String inputLine;
-
-            while ((inputLine = in.readLine()) != null)
-                retStr+=inputLine;
-
-            in.close();
-
-            System.out.println(retStr);
-            return retStr;
-        } catch (IOException e) {
-
-            System.out.println("LOADING fucked up");
-            throw new RuntimeException(e);
-        }
-    }
-
     public void reloadApp(){
         Intent intent = getIntent();
         finish();
@@ -343,6 +320,7 @@ public class MainActivity extends AppCompatActivity {
             ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
             ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
             EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
+            EditText notificationPrelay = (EditText) customView.findViewById(R.id.notification_prelay);
             EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
             // Selection of the spinner
@@ -384,6 +362,7 @@ public class MainActivity extends AppCompatActivity {
             jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
             jsonObject.put("repeat_toggle", repeatToggle.isChecked() ? repeatToggle.getTextOn() : repeatToggle.getTextOff());
             jsonObject.put("duration", duration.getText());
+            jsonObject.put("notification_prelay", notificationPrelay.getText());
             jsonObject.put("stop_number", stopNumberText.getText());
             jsonObject.put("selected_days", selectedDays);
 
