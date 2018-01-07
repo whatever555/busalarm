@@ -40,6 +40,7 @@ public class Alarm extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
+        sendNotification(context, " booots");
 
        // setAlarms(context);
 
@@ -159,7 +160,7 @@ public class Alarm extends BroadcastReceiver {
         i.putExtra("name", name);
 
         PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 11, pi); // Millisec * Second * Minute
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 31, pi); // Millisec * Second * Minute
     }
 
     public void cancelAlarm(Context context, int requestCode, String name) {

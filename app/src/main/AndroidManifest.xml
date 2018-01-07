@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <receiver android:process=":remote" android:name=".Alarm"></receiver>
+        <receiver android:name=".BootCompletedReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -20,7 +26,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </activity>
     </application>
