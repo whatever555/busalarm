@@ -2,6 +2,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/mainBack"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto">
 <TableLayout
@@ -31,7 +32,7 @@
     android:layout_below="@id/top_sticky_label"
     android:layout_height="match_parent"
     android:id="@+id/addAlarmScreen"
-    android:background="#ffffff"
+    android:background="@color/mainBack"
     android:fillViewport="true">
     <LinearLayout android:layout_width="fill_parent"
         android:layout_height="wrap_content"

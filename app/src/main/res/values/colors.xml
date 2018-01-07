@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="mainBack">#FCFCFF</color>
+
     <color name="primaryBack">#D4D4D7</color>
     <color name="secondaryBack">#EAEAF1</color>
     <color name="tertiaryBack">#EEEEF1</color>
