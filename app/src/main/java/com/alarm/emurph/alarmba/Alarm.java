@@ -77,7 +77,6 @@ public class Alarm extends BroadcastReceiver {
 
                     int active = Integer.parseInt(currentAlarmData.getString("active"));
 
-                    if (active == 1)
                     if (currentAlarmData.getString("selected_days").contains(Integer.toString(currentDayInt))) {
                         int hrs = Integer.parseInt(currentAlarmData.getString("hrs"));
                         int mins = Integer.parseInt(currentAlarmData.getString("mins"));
@@ -91,7 +90,7 @@ public class Alarm extends BroadcastReceiver {
 
                         int calendarTime = (nowHour * 60) + nowMinute;
 
-                        if (calendarTime < alarmTime + duration && calendarTime >= alarmTime) {
+                        if (active == 1 && calendarTime < alarmTime + duration && calendarTime >= alarmTime) {
 
                             try {
                                 //    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();

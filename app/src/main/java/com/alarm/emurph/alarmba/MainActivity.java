@@ -30,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.io.BufferedReader;
@@ -127,10 +128,10 @@ public class MainActivity extends AppCompatActivity {
                 view = layoutInflater.inflate(R.layout.alarm_listing, parentLayout, false);
 
                 // In order to get the view we have to use the new view with text_layout in it
-                TableLayout alarmView = (TableLayout)view.findViewById(R.id.alarmView);
+                LinearLayout alarmView = (LinearLayout)view.findViewById(R.id.alarmView);
 
                 TableRow editAlarmTR = (TableRow)view.findViewById(R.id.editAlarmTR);
-                Button editButton = (Button)view.findViewById(R.id.editAlarm);
+                TextView alarmNameText = (TextView) view.findViewById(R.id.editAlarm);
 
                 int active = Integer.parseInt(row.getString("active"));
                 final Switch activeToggle = (Switch)view.findViewById(R.id.active_toggle);
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if (active == 0)
                     activeToggle.setChecked(false);
 
-                editButton.setText(name);
+                alarmNameText.setText(name);
 
                 // Add the text view to the parent layout
                 parentLayout.addView(alarmView);
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                         openAlarmWindow(row);
                     }
                 });
-                editButton.setOnClickListener(new View.OnClickListener() {
+                alarmNameText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         openAlarmWindow(row);
