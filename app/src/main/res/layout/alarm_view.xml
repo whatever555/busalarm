@@ -260,9 +260,21 @@
                 android:paddingLeft="20dp"
                 android:height="46dp"
                 android:singleLine="true"
-                android:layout_span="12"
+                android:layout_span="6"
                 android:textColor="#777779"
                 android:text="Bus route(s):"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/buttonHeight"
+                android:textSize="12sp"
+                android:gravity="left"
+                android:paddingTop="20dp"
+                android:paddingLeft="20dp"
+                android:height="46dp"
+                android:singleLine="true"
+                android:layout_span="6"
+                android:textColor="#777779"
+                android:text="(Leave blank for all routes)"/>
         </TableRow>
     </TableLayout>
 
@@ -336,7 +348,7 @@
                 custom:highlight_color="@color/positiveGreen"
                 custom:background_color="#565657"
                 custom:text_color="#111112"
-                custom:sunday_first_day="false" />
+                custom:sunday_first_day="true" />
         </TableRow>
     </TableLayout>
 
@@ -435,7 +447,7 @@
                 android:layout_span="4"
                 android:background="@color/buttonBack"
                 android:textColor="@color/buttonText"
-                android:text="Cancel" />
+                android:text="Close" />
             <Button
                 android:id="@+id/delete_button"
                 android:layout_width="match_parent"

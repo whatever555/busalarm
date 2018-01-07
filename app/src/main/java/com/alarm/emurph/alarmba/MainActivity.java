@@ -3,11 +3,13 @@ package com.alarm.emurph.alarmba;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,12 +20,14 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.ToggleButton;
@@ -117,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 final JSONObject row = jsonArray.getJSONObject(i);
 
                 String name = row.getString("name");
+                final int alarmId = Integer.parseInt(row.getString("alarm_id"));
 
                 // Add the text layout to the parent layout
                 view = layoutInflater.inflate(R.layout.alarm_listing, parentLayout, false);
@@ -126,10 +131,25 @@ public class MainActivity extends AppCompatActivity {
 
                 TableRow editAlarmTR = (TableRow)view.findViewById(R.id.editAlarmTR);
                 Button editButton = (Button)view.findViewById(R.id.editAlarm);
+
+                int active = Integer.parseInt(row.getString("active"));
+                final Switch activeToggle = (Switch)view.findViewById(R.id.active_toggle);
+
+                if (active == 0)
+                    activeToggle.setChecked(false);
+
                 editButton.setText(name);
 
                 // Add the text view to the parent layout
                 parentLayout.addView(alarmView);
+
+                activeToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        // do something, the isChecked will be
+                        // true if the switch is in the On position
+                        toggleActive(alarmId, activeToggle.isChecked());
+                    }
+                });
 
                 editAlarmTR.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -155,10 +175,8 @@ public class MainActivity extends AppCompatActivity {
         return  (int) (new Date().getTime()/1000);
     }
 
-
-
     public void openAlarmWindow(JSONObject row) {
-        Context mContext = this;
+        final Context mContext = this;
         // Parent layout
         int resID = getResources().getIdentifier("main_layout", "id", getPackageName());
         RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
@@ -175,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 LayoutParams.MATCH_PARENT,
                 true
         );
-
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
         // Set an elevation value for popup window
         // Call requires API level 21
         if (Build.VERSION.SDK_INT >= 21) {
@@ -183,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         EditText name = (EditText) customView.findViewById((R.id.name));
-
+        name.setTag("1");
 
         NumberPicker minsNumPick = (NumberPicker) customView.findViewById(R.id.mins);
         NumberPicker hrsNumPick = (NumberPicker) customView.findViewById(R.id.hrs);
@@ -197,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
         hrsNumPick.setMaxValue(11);
         hrsNumPick.setValue(7);
         minsNumPick.setValue(30);
+
+        notificationPrelay.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "59")});
+        duration.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "45")});
 
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
             @Override
@@ -232,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        System.out.println("LADOMG TAG : "+name.getTag());
+
         // Get a reference for the custom view save button
         Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
@@ -258,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (deleteAlarm(alarmId)) {
+                        if (alarmData.deleteAlarm(mContext, alarmId)) {
                             mPopupWindow.dismiss();
                             loadApp();
                         }
@@ -266,6 +290,9 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 name.setText(row.getString("name"));
+                name.setTag(row.getString("active"));
+                System.out.println("SETTING TAG : "+row.getString("active"));
+                System.out.println("GETTING TAG : "+name.getTag());
                 minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
                 hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
 
@@ -290,7 +317,9 @@ public class MainActivity extends AppCompatActivity {
 
                 WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
 
-                List<String> selectedDays = Arrays.asList(row.getString("selected_days").split("\\s*,\\s*"));
+                List<String> selectedDays = Arrays.asList(
+                        row.getString("selected_days").split("\\s*,\\s*")
+                );
 
                 List<Integer> selectedDaysInts = new ArrayList<>();
                 for (String day : selectedDays) {
@@ -342,7 +371,6 @@ public class MainActivity extends AppCompatActivity {
 
             String selectedDays = TextUtils.join(",", selectedDaysList);
 
-            String active = "1";
 
             int alarmId;
             if (row == null) {
@@ -350,13 +378,14 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 alarmId = Integer.parseInt(row.getString("alarm_id"));
-                deleteAlarm(alarmId);
+                jsonArray.remove(alarmData.getAlarmIndex(this, alarmId));
+              //  alarmData.deleteAlarm(this, alarmId);
             }
 
             jsonObject.put("alarm_id", Integer.toString(alarmId));
-            jsonObject.put("active", active);
-            jsonObject.put("routes", routes);
+            jsonObject.put("active", name.getTag());
             jsonObject.put("name", name.getText());
+            jsonObject.put("routes", routes);
             jsonObject.put("hrs", hrsNumPick.getValue());
             jsonObject.put("mins", minsNumPick.getValue());
             jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
@@ -377,9 +406,16 @@ public class MainActivity extends AppCompatActivity {
 
             Alarm alarm = new Alarm();
 
-            alarm.setAlarm(this, alarmId, nameStr, hrs, minsNumPick.getValue());
+          //  alarm.setAlarm(this, alarmId, nameStr, hrs, minsNumPick.getValue());
 
-            return alarmData.writeToFile(this, jsonArray.toString());
+          //  alarmData.writeToFile(this, jsonArray.toString());
+
+
+            alarmData.writeToFile(this, jsonArray.toString());
+
+            alarm.setAlarms(this);
+
+            return true;
 
         }
         catch (JSONException e) {
@@ -388,16 +424,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    public boolean deleteAlarm(int alarmId) {
+    public boolean toggleActive(int alarmId, boolean isChecked) {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final JSONObject row = jsonArray.getJSONObject(i);
                 if(Integer.toString(alarmId).equals(row.getString("alarm_id")))
                 {
-                    jsonArray.remove(i);
+                    if (isChecked)
+                    {
+                        row.put("active", "1");
+                    }
+                    else {
+                        row.put("active", "0");
+                    }
                     return alarmData.writeToFile(this, jsonArray.toString());
-
                 }
             }
             catch (JSONException e) {
@@ -407,8 +447,6 @@ public class MainActivity extends AppCompatActivity {
 
         return false;
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

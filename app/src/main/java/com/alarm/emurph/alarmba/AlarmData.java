@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -19,7 +21,7 @@ import java.io.OutputStreamWriter;
 
 public class AlarmData {
 
-    String FILENAME = "alarms.json";
+    String FILENAME = "alarmData.json";
     String jsonString;
     JSONArray jsonArray;
 
@@ -52,6 +54,48 @@ public class AlarmData {
         }
 
         return ret;
+    }
+
+
+    public boolean deleteAlarm(Context context, int alarmId) {
+        String jsonString = readFromFile(context);
+
+        try {
+            jsonArray = new JSONArray(jsonString);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                    final JSONObject row = jsonArray.getJSONObject(i);
+                    if (Integer.toString(alarmId).equals(row.getString("alarm_id"))) {
+                        jsonArray.remove(i);
+                        return writeToFile(context, jsonArray.toString());
+                    }
+                }
+            }
+            catch (JSONException e) {
+            System.out.println(e.getMessage());
+            }
+
+        return false;
+    }
+
+    public int getAlarmIndex(Context context, int alarmId)
+    {
+        String jsonString = readFromFile(context);
+
+        try {
+            jsonArray = new JSONArray(jsonString);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                final JSONObject row = jsonArray.getJSONObject(i);
+                if (Integer.toString(alarmId).equals(row.getString("alarm_id"))) {
+                    return i;
+                }
+            }
+        }
+        catch (JSONException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return -1;
+
     }
 
 
