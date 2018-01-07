@@ -12,17 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.PowerManager;
-import android.os.StrictMode;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,7 +29,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
 
@@ -127,9 +121,7 @@ public class Alarm extends BroadcastReceiver {
                                 }
                             }
                             //sendNotification(context, " CANCELLINGs " +currentAlarmData.getString("repeat_toggle"));
-
                         }
-
                     }
                 }
             } catch (JSONException e) {
