@@ -40,8 +40,6 @@ public class Alarm extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
-        sendNotification(context, " booots");
-
        // setAlarms(context);
 
         wl.acquire();
