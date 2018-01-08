@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -28,16 +29,10 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Calendar;
 import com.dpro.widgets.WeekdaysPicker;
 
 import org.json.JSONArray;
@@ -47,7 +42,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -71,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     String jsonString;
 
     JSONArray jsonArray;
+    private CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +86,23 @@ public class MainActivity extends AppCompatActivity {
                 openAlarmWindow(null);
             }
         });
+
+        timer = new CountDownTimer(20000, 20) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                try{
+                    loadApp();
+                }catch(Exception e){
+                    Log.e("Error", "Error: " + e.toString());
+                }
+            }
+        }.start();
 
         loadApp();
     }
@@ -152,6 +164,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+                if (alarmData.isActive(row))
+                {
+                    editAlarmTR.setBackgroundColor(Color.RED);
+                }
+
                 editAlarmTR.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -169,7 +186,10 @@ public class MainActivity extends AppCompatActivity {
         catch (JSONException e) {
             System.out.println(e.getMessage());
         }
+        timer.start();
     }
+
+
 
 
     public int getCurrentTimestamp(){
@@ -414,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
 
             alarmData.writeToFile(this, jsonArray.toString());
 
-            alarm.setAlarms(this);
+            alarm.setAlarms(this, 0);
 
             return true;
 

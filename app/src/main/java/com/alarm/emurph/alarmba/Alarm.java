@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -37,25 +36,23 @@ public class Alarm extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+        try {
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
-       // setAlarms(context);
+            // setAlarms(context);
 
-        wl.acquire();
+            wl.acquire();
 
-        // Put here YOUR code.
-        //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
-
-        int requestCode = intent.getIntExtra("requestCode", 0);
-        String name = intent.getStringExtra("name");
-
-        if (requestCode == 0) {
-            cancelAlarm(context, 0, name);
-        } else {
+            // Put here YOUR code.
+            //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+            String name; int requestCode = 0;
+            try {
+                requestCode = intent.getIntExtra("requestCode", 0);
+                name = intent.getStringExtra("name");
+            }catch(Exception e){ return;}
             String jsonString = alarmData.readFromFile(context);
             try {
-
                 JSONObject currentAlarmData = null;
                 JSONArray jsonArray = new JSONArray(jsonString);
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -65,111 +62,101 @@ public class Alarm extends BroadcastReceiver {
                         break;
                     }
                 }
-                if (currentAlarmData == null) {
-                    cancelAlarm(context, requestCode, name);
+
+                if (alarmData.isActive(currentAlarmData)) {
+                    try {
+                        //    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        //    StrictMode.setThreadPolicy(policy);
+
+                        String stopNumber = currentAlarmData.getString("stop_number");
+
+                        // String jsonBusString = getStopInfo(stopNumber);
+                        AsyncLoader RF = new AsyncLoader(context, stopNumber, currentAlarmData);
+                        RF.execute();
+
+                    } catch (Exception e) {
+                        setAlarms(context, 0);
+                    }
                 } else {
-                    Date now = new Date();
+                    setAlarms(context, 0);
+                    cancelAlarm(context, requestCode, name, false);
 
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(now);
-                    int currentDayInt = calendar.get(Calendar.DAY_OF_WEEK);
+                    if (currentAlarmData.getString("repeat_toggle").equals("No")) {
+                        String days = currentAlarmData.getString("selected_days");
+                        List<String> selectedDays = Arrays.asList(
+                                days.split("\\s*,\\s*")
+                        );
 
-                    int active = Integer.parseInt(currentAlarmData.getString("active"));
+                        int lastDay = Integer.parseInt(selectedDays.get(selectedDays.size() - 1));
 
-                    if (currentAlarmData.getString("selected_days").contains(Integer.toString(currentDayInt))) {
-                        int hrs = Integer.parseInt(currentAlarmData.getString("hrs"));
-                        int mins = Integer.parseInt(currentAlarmData.getString("mins"));
-                        int duration = Integer.parseInt(currentAlarmData.getString("duration"));
-                        hrs += currentAlarmData.getString("ampm").equals("PM") ? 12 : 0;
+                        Date now = new Date();
 
-                        int alarmTime = (hrs * 60) + mins;
-
-                        int nowHour = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
-                        int nowMinute = calendar.get(Calendar.MINUTE);
-
-                        int calendarTime = (nowHour * 60) + nowMinute;
-
-                        if (active == 1 && calendarTime < alarmTime + duration && calendarTime >= alarmTime) {
-
-                            try {
-                                //    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                                //    StrictMode.setThreadPolicy(policy);
-
-                                String stopNumber = currentAlarmData.getString("stop_number");
-
-                               // String jsonBusString = getStopInfo(stopNumber);
-                                AsyncLoader RF = new AsyncLoader(context, stopNumber, currentAlarmData);
-                                RF.execute();
-
-                            } catch (Exception e) {
-                                sendNotification(context, " fucked up inmores");
-                            }
-                        } else {
-                            cancelAlarm(context, requestCode, name);
-
-                            if (currentAlarmData.getString("repeat_toggle").equals("No")) {
-                                String days = currentAlarmData.getString("selected_days");
-                                List<String> selectedDays = Arrays.asList(
-                                        days.split("\\s*,\\s*")
-                                );
-
-                                int lastDay = Integer.parseInt(selectedDays.get(selectedDays.size() - 1));
-                                if (lastDay == currentDayInt) {
-                                    disableNonRepeatingAlarm(context, requestCode);
-                                }
-                            }
-                            //sendNotification(context, " CANCELLINGs " +currentAlarmData.getString("repeat_toggle"));
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(now);
+                        int currentDayInt = calendar.get(Calendar.DAY_OF_WEEK);
+                        if (lastDay == currentDayInt) {
+                            disableNonRepeatingAlarm(context, requestCode, 0);
                         }
                     }
                 }
-            } catch (JSONException e) {
+            } catch (Exception e) {
+            } finally {
+                //  setAlarms(context, 0);
+                //  cancelAlarm(context, requestCode, name, false);
             }
-        }
 
-        wl.release();
+            wl.release();
+        }catch(Exception e){}
     }
 
 
     public void setAlarm(Context context, int requestCode, String name, int hrs, int mins) {
+        try {
+            Calendar calendar = new GregorianCalendar();
+            Calendar calendar2 = new GregorianCalendar();
 
-        Calendar calendar = new GregorianCalendar();
-        Calendar calendar2 = new GregorianCalendar();
+            Date date = new Date();
+            date.setTime(System.currentTimeMillis() + (60 * 60 * 1000));
+            calendar.setTime(date);
+            calendar2.setTime(date);
 
-        Date date = new Date();
-        date.setTime(System.currentTimeMillis() + (60 * 60 * 1000));
-        calendar.setTime(date);
-        calendar2.setTime(date);
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar2.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, hrs);
+            calendar.set(Calendar.MINUTE, mins);
 
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar2.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, hrs);
-        calendar.set(Calendar.MINUTE, mins);
+            if (calendar.getTimeInMillis() < calendar2.getTimeInMillis() - 1000) {
+                calendar.add(Calendar.DATE, 1);
+            }
 
-        if (calendar.getTimeInMillis() < calendar2.getTimeInMillis() - 1000) {
-            calendar.add(Calendar.DATE, 1);
-        }
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            Intent i = new Intent(context, Alarm.class);
+            i.putExtra("requestCode", requestCode);
+            i.putExtra("hrs", hrs);
+            i.putExtra("mins", mins);
+            i.putExtra("name", name);
 
-        Intent i = new Intent(context, Alarm.class);
-        i.putExtra("requestCode", requestCode);
-        i.putExtra("hrs", hrs);
-        i.putExtra("mins", mins);
-        i.putExtra("name", name);
-
-        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 31, pi); // Millisec * Second * Minute
+            PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 26, pi); // Millisec * Second * Minute
+        }catch(Exception e){}
     }
 
-    public void cancelAlarm(Context context, int requestCode, String name) {
-        Intent intent = new Intent(context, Alarm.class);
-        PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(sender);
-        setAlarms(context);
-    }
+    public void cancelAlarm(Context context, int requestCode, String name, boolean beforeSetting) {
+        try {
+            Intent intent = new Intent(context, Alarm.class);
+            PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, 0);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(sender);
+            //  if (!beforeSetting) {
+            //      setAlarms(context, 0);
+            //  }
+        }catch(Exception e){}
+
+}
 
     public void sendNotification(Context context, String message) {
+        try{
         PugNotification.with(context)
                 .load()
                 .title(message)
@@ -180,28 +167,10 @@ public class Alarm extends BroadcastReceiver {
                 .flags(Notification.DEFAULT_ALL)
                 .simple()
                 .build();
+        }catch(Exception e){}
+
     }
 
-
-    public String getStopInfo(String stopId) {
-        try {
-            String retStr = "";
-            URL busList = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopId + "&format=json");
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            busList.openStream()));
-
-            String inputLine;
-
-            while ((inputLine = in.readLine()) != null)
-                retStr += inputLine;
-
-            in.close();
-            return retStr;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     private class AsyncLoader extends AsyncTask<String, Integer, String> {
@@ -227,8 +196,8 @@ public class Alarm extends BroadcastReceiver {
         protected String doInBackground(String... str) {
             try {
                 // Enter URL address where your php file resides
-               // url = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopNumber + "&format=json");
-                url = new URL("https://imaga.me/test.php");
+                url = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopNumber + "&format=json");
+                //url = new URL("https://imaga.me/test.php");
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -246,7 +215,7 @@ public class Alarm extends BroadcastReceiver {
                 // setDoOutput to true as we recieve data from json file
                 conn.setDoOutput(false);
 
-            } catch (IOException e1) {
+            } catch (Exception e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
 
@@ -254,46 +223,54 @@ public class Alarm extends BroadcastReceiver {
             }
 
             try {
-
                 int response_code = conn.getResponseCode();
 
                 // Check if successful connection made
                 if (response_code == HttpURLConnection.HTTP_OK) {
+                    try {
+                        // Read data sent from server
+                        InputStream input = conn.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                        StringBuilder result = new StringBuilder();
+                        String line;
 
-                    // Read data sent from server
-                    InputStream input = conn.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-                    StringBuilder result = new StringBuilder();
-                    String line;
+                        while ((line = reader.readLine()) != null) {
+                            result.append(line);
+                        }
 
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
+                        jsonBusString = result.toString();
+                        // Pass data to onPostExecute method
+                        return (result.toString());
                     }
+                    catch(Exception e) {
 
-                    jsonBusString = result.toString();
-                    // Pass data to onPostExecute method
-                    return (result.toString());
+                        return ("unsuccessful");
+                    }
 
                 } else {
 
                     return ("unsuccessful");
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
+            }catch(Exception e){
+                //sendNotification(context, "ERROR 4" +  e.getClass().getSimpleName());
+                //e.printStackTrace();
+
                 return "";
             } finally {
+              //  setAlarms(context, 0);
                 conn.disconnect();
             }
         }
 
         @Override
         protected void onPostExecute(String s) {
+            try{
             super.onPostExecute(s);
 
+            if (jsonBusString != null)
             if (jsonBusString.length() > 1) {
                 try {
-
                     JSONObject routes = this.currentAlarmData.getJSONObject("routes");
 
                     String route1 = routes.getString("r1");
@@ -305,35 +282,35 @@ public class Alarm extends BroadcastReceiver {
                         JSONArray stopDataArray = busArray.getJSONArray("results");
                         boolean allRoutes = route1.equals(route2) && route2.equals(route3) && route3.equals("select");
 
+                        if (stopDataArray != null)
                         for (int i = 0; i < stopDataArray.length(); i++) {
                             final JSONObject row = stopDataArray.getJSONObject(i);
 
                             String busRoute = row.getString("route");
-                            int duetime = Integer.parseInt(row.getString("duetime"));
+                            try {
+                                int duetime = Integer.parseInt(row.getString("duetime"));
 
-                            int notificaionPrelay = Integer.parseInt(currentAlarmData.getString("notification_prelay"));
+                                int notificationPrelay = Integer.parseInt(currentAlarmData.getString("notification_prelay"));
 
-
-                            if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
-                                if (duetime == notificaionPrelay) {
-                                    sendNotification(context, busRoute + " arriving to stop " + stopNumber + " in " + notificaionPrelay + " mins");
+                                if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
+                                    if (duetime == notificationPrelay) {
+                                        sendNotification(context, busRoute + " arriving to stop " + stopNumber + " in " + notificationPrelay + " mins");
+                                    }
                                 }
-                            }
-                                                    }
-                    } catch (JSONException e) {
-                        sendNotification(context, " fucked up in 5 mins");
-
-                    }
+                            }catch(Exception e){}
+                        }
+                    }catch(Exception e){}
                     //content.setText(sb.toString());
-                } catch (JSONException e) {
-
-                }
+                }catch(Exception e){}
             }
+            }catch(Exception e){}
         }
+
 
     }
 
-    public void disableNonRepeatingAlarm(Context context, int alarmId) {
+    public void disableNonRepeatingAlarm(Context context, int alarmId, int attempt) {
+        try{
         String jsonString = alarmData.readFromFile(context);
         try {
             JSONObject currentAlarmData = null;
@@ -348,14 +325,23 @@ public class Alarm extends BroadcastReceiver {
 
                 }
             }
-        }catch(JSONException e){}
+        }catch(JSONException e){
+            if (attempt < 3) {
+                disableNonRepeatingAlarm(context, alarmId, attempt++);
+            }
+            else {
+              //  setAlarms(context, 0);
+            }
+        }
+
+        }catch(Exception e){}
     }
 
 
-    public void setAlarms(Context context) {
+    public void setAlarms(Context context, int attempt) {
+        try{
         String jsonString = alarmData.readFromFile(context);
         try {
-            JSONObject currentAlarmData = null;
             JSONArray jsonArray = new JSONArray(jsonString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 final JSONObject row = jsonArray.getJSONObject(i);
@@ -368,10 +354,16 @@ public class Alarm extends BroadcastReceiver {
                     hrs+=12;
                 }
                 String alarmName = row.getString("name");
-
+                cancelAlarm(context, alarmId, alarmName, true);
                 setAlarm(context, alarmId, alarmName, hrs, mins);
             }
-        }catch(JSONException e){}
+        }catch(JSONException e){
+            if (attempt < 3) {
+                setAlarms(context, attempt++);
+            }
 
+        }
+
+        }catch(Exception e){}
     }
 }

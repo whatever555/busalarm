@@ -11,6 +11,6 @@ import android.content.Intent;
 public class BootCompletedReceiver extends BroadcastReceiver{
     public void onReceive(Context context, Intent intent) {
         Alarm alarm = new Alarm();
-        alarm.setAlarms(context);
+        alarm.setAlarms(context, 0);
     }
 }

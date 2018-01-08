@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by eddie on 05/01/18.
@@ -21,7 +23,7 @@ import java.io.OutputStreamWriter;
 
 public class AlarmData {
 
-    String FILENAME = "alarmData.json";
+    String FILENAME = "alarmData2.json";
     String jsonString;
     JSONArray jsonArray;
 
@@ -54,6 +56,40 @@ public class AlarmData {
         }
 
         return ret;
+    }
+
+    public boolean isActive(JSONObject currentAlarmData)
+    {
+        Date now = new Date();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        int currentDayInt = calendar.get(Calendar.DAY_OF_WEEK);
+
+        try {
+            int hrs = Integer.parseInt(currentAlarmData.getString("hrs"));
+            int mins = Integer.parseInt(currentAlarmData.getString("mins"));
+            int duration = Integer.parseInt(currentAlarmData.getString("duration"));
+            hrs += currentAlarmData.getString("ampm").equals("PM") ? 12 : 0;
+
+            int alarmTime = (hrs * 60) + mins;
+
+            int nowHour = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
+            int nowMinute = calendar.get(Calendar.MINUTE);
+
+            int calendarTime = (nowHour * 60) + nowMinute;
+
+            int active = Integer.parseInt(currentAlarmData.getString("active"));
+
+            return currentAlarmData.getString("selected_days").
+                    contains(Integer.toString(currentDayInt))
+                    && active == 1
+                    && calendarTime < alarmTime + duration
+                    && calendarTime >= alarmTime;
+
+        }
+        catch (JSONException e){}
+        return false;
     }
 
 
