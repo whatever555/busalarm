@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,9 +24,10 @@ import java.util.Date;
 
 public class AlarmData {
 
-    String FILENAME = "alarmData2.json";
+    String FILENAME = "alarmData3.json";
     String jsonString;
     JSONArray jsonArray;
+
 
     public String readFromFile(Context context) {
 
