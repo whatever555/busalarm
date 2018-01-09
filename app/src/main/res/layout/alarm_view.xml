@@ -24,7 +24,7 @@
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:text="Alarm Details"/>
+            android:text="Schedule notification"/>
     </TableRow>
 </TableLayout>
 <ScrollView
@@ -66,7 +66,7 @@
                 android:layout_span="12"
                 android:backgroundTint="@color/secondaryColor"
                 android:textColor="#777779"
-                android:hint="Alarm name"
+                android:hint="Notification name"
                 android:inputType="text">
             </EditText>
     </TableRow>
@@ -90,7 +90,7 @@
         android:singleLine="true"
         android:layout_span="12"
         android:textColor="#777779"
-        android:text="Time"/>
+        android:text="Scheduled time for notifications"/>
     </TableRow>
 </TableLayout>
 <TableLayout
@@ -148,7 +148,7 @@
             android:singleLine="true"
             android:layout_span="12"
             android:textColor="#777779"
-            android:text="Alarm duration (minutes):"/>
+            android:text="Disable after: (minutes):"/>
     </TableRow>
 </TableLayout>
 
@@ -207,7 +207,7 @@
                 android:singleLine="true"
                 android:layout_span="12"
                 android:textColor="#777779"
-                android:text="Stop number:"/>
+                android:text="Dublin Bus stop number:"/>
         </TableRow>
     </TableLayout>
 
@@ -470,8 +470,6 @@
         </TableRow>
 
     </TableLayout>
-
-
 
     </LinearLayout>
     </ScrollView>

@@ -675,9 +675,6 @@ public class MainActivity extends AppCompatActivity {
                     final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
                     final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
-                    routeSpinner1.setSelection(0);
-                    routeSpinner2.setSelection(0);
-                    routeSpinner3.setSelection(0);
 
                     routeSpinner1.setEnabled(true);
                     routeSpinner2.setEnabled(true);
