@@ -30,7 +30,7 @@
                     android:singleLine="true"
                     android:layout_span="12"
                     android:textColor="#777779"
-                    android:text="My Alarms"/>
+                    android:text="My Scheduled Notifications"/>
             </TableRow>
         </TableLayout>
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
