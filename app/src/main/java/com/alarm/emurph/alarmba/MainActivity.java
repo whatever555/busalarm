@@ -20,7 +20,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.OnItemSelectedListener;
+
+
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -53,7 +57,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    ArrayAdapter<String> spinnerArrayAdapter;
     int currentInc = 0;
     String[] allBusesArray = new String[]{
             "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
@@ -69,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
             "142","145","150","151","161","184","185","220","236","238","239",
             "270","747","757"
     };
+
+    String r1,r2,r3 = "select";
 
     ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
     ArrayList<String> allBusesDisplay = new ArrayList<String>(allBuses);
@@ -197,7 +203,19 @@ public class MainActivity extends AppCompatActivity {
         timer.start();
     }
 
+    //private method of your class
+    private int getIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
 
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
 
 
     public int getCurrentTimestamp(){
@@ -245,8 +263,8 @@ public class MainActivity extends AppCompatActivity {
         hrsNumPick.setValue(7);
         minsNumPick.setValue(30);
 
-        notificationPrelay.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "59")});
-        duration.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "45")});
+        notificationPrelay.setFilters(new InputFilter[]{new InputFilterMinMax("1", "59")});
+        duration.setFilters(new InputFilter[]{new InputFilterMinMax("1", "45")});
 
 
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
@@ -264,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
         // Application of the Array to the Spinner
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
+        spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
         routeSpinner1.setAdapter(spinnerArrayAdapter);
@@ -284,10 +302,57 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+        routeSpinner1.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                r1 = routeSpinner1.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
+
+        routeSpinner2.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                r2 = routeSpinner2.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
+
+        routeSpinner3.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                r3 = routeSpinner3.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
+        allBusesDisplay.addAll(allBusesDisplay);
+        try {
+        final String stopVal = (row == null) ? "0" : row.getString("stop_number");
+
         stopNumberText.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start,
@@ -297,33 +362,47 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
-
-                routeSpinner1.setEnabled(false);
-                routeSpinner2.setEnabled(false);
-                routeSpinner3.setEnabled(false);
-                routeSpinner1.setClickable(false);
-                routeSpinner2.setClickable(false);
-                routeSpinner3.setClickable(false);
-
-                allBusesDisplay.removeAll(allBusesDisplay);
-                customView.requestLayout();
-
-                currentInc ++;
-                final int snapInc = currentInc;
                 try {
-                    if (s.length() > 0) {
-                        RouteLister RL = new RouteLister(
-                                mContext,
-                                stopNumberText.getText().toString(),
-                                customView,
-                                snapInc
-                        );
-                        RL.execute();
+                    int st = Integer.parseInt(stopNumberText.getText().toString());
+                    System.out.println("STOP: " + stopNumberText.getText() + "    stop: " + stopVal);
+                    if (st != 0 && st != Integer.parseInt(stopVal)) {
+                        System.out.println("IN: " + stopNumberText.getText() + "    IN: " + stopVal);
+                        routeSpinner1.setEnabled(false);
+                        routeSpinner2.setEnabled(false);
+                        routeSpinner3.setEnabled(false);
+                        routeSpinner1.setClickable(false);
+                        routeSpinner2.setClickable(false);
+                        routeSpinner3.setClickable(false);
+
+                        allBusesDisplay.removeAll(allBusesDisplay);
+                        customView.requestLayout();
+
+                        currentInc++;
+                        final int snapInc = currentInc;
+                        try {
+                            if (s.length() > 0) {
+                                RouteLister RL = new RouteLister(
+                                        mContext,
+                                        stopNumberText.getText().toString(),
+                                        customView,
+                                        snapInc
+                                );
+                                RL.execute();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }catch(Exception e){}
+                }catch(Exception e){
+
+                    e.printStackTrace();
+
+                }
             }
         });
-
+    }catch (Exception e){
+            e.printStackTrace();
+        }
         // Get a reference for the custom view save button
         Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
@@ -373,12 +452,16 @@ public class MainActivity extends AppCompatActivity {
                 stopNumberText.setText(row.getString("stop_number"));
 
                 JSONObject routes = row.getJSONObject("routes");
+                System.out.println("---R1 " +routes.getString("r1")+" R2 "+routes.getString("r2")+" R3 "+routes.getString("r3"));
 
-                int spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r1"));
+                r1 = routes.getString("r1");
+                r2 = routes.getString("r2");
+                r3 = routes.getString("r3");
+                int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
                 routeSpinner1.setSelection(spinnerPosition);
-                spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r2"));
+                spinnerPosition = spinnerArrayAdapter.getPosition(r2);
                 routeSpinner2.setSelection(spinnerPosition);
-                spinnerPosition = spinnerArrayAdapter.getPosition(routes.getString("r3"));
+                spinnerPosition = spinnerArrayAdapter.getPosition(r3);
                 routeSpinner3.setSelection(spinnerPosition);
 
                 WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
@@ -418,25 +501,17 @@ public class MainActivity extends AppCompatActivity {
             EditText notificationPrelay = (EditText) customView.findViewById(R.id.notification_prelay);
             EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
-            // Selection of the spinner
-            final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-            final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-            final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
-
-            String route1 = routeSpinner1.getSelectedItem().toString();
-            String route2 = routeSpinner2.getSelectedItem().toString();
-            String route3 = routeSpinner3.getSelectedItem().toString();
-
             JSONObject routes = new JSONObject();
-            routes.put("r1",route1);
-            routes.put("r2",route2);
-            routes.put("r3",route3);
+
+            System.out.println("R1 " +r1+" R2 "+r2+" R3 "+r3);
+            routes.put("r1",r1);
+            routes.put("r2",r2);
+            routes.put("r3",r3);
 
             WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
             List<Integer> selectedDaysList = widget.getSelectedDays();
 
             String selectedDays = TextUtils.join(",", selectedDaysList);
-
 
             int alarmId;
             if (row == null) {
@@ -472,9 +547,6 @@ public class MainActivity extends AppCompatActivity {
 
             Alarm alarm = new Alarm();
 
-          //  alarm.setAlarm(this, alarmId, nameStr, hrs, minsNumPick.getValue());
-
-          //  alarmData.writeToFile(this, jsonArray.toString());
 
 
             alarmData.writeToFile(this, jsonArray.toString());
@@ -674,6 +746,14 @@ public class MainActivity extends AppCompatActivity {
                     final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
                     final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
                     final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+
+
+                    int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
+                    routeSpinner1.setSelection(spinnerPosition);
+                    spinnerPosition = spinnerArrayAdapter.getPosition(r2);
+                    routeSpinner2.setSelection(spinnerPosition);
+                    spinnerPosition = spinnerArrayAdapter.getPosition(r3);
+                    routeSpinner3.setSelection(spinnerPosition);
 
 
                     routeSpinner1.setEnabled(true);
