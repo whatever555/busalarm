@@ -280,7 +280,7 @@ public class Alarm extends BroadcastReceiver {
                     try {
                         JSONObject busArray = new JSONObject(jsonBusString);
                         JSONArray stopDataArray = busArray.getJSONArray("results");
-                        boolean allRoutes = route1.equals(route2) && route2.equals(route3) && route3.equals("select");
+                        boolean allRoutes = route1.equals(route2) && route2.equals(route3) && (route3.equals("select") || (route3.equals("----------")));
 
                         if (stopDataArray != null)
                         for (int i = 0; i < stopDataArray.length(); i++) {
@@ -305,8 +305,6 @@ public class Alarm extends BroadcastReceiver {
             }
             }catch(Exception e){}
         }
-
-
     }
 
     public void disableNonRepeatingAlarm(Context context, int alarmId, int attempt) {

@@ -4,14 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,6 +41,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -46,7 +54,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    String[] allBuses = new String[]{
+    int currentInc = 0;
+    String[] allBusesArray = new String[]{
             "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
             "15","15a","15b","15d","16","16c","17","17a","18","25",
             "25a","25b","25d","25x","26","27","27a","27b","27x","29a",
@@ -61,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             "270","747","757"
     };
 
+    ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
+    ArrayList<String> allBusesDisplay = new ArrayList<String>(allBuses);
     AlarmData alarmData;
     String jsonString;
 
@@ -71,12 +82,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.out.println("OPENEND");
         alarmData = new AlarmData();
-        System.out.println("OPENEND2");
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        System.out.println("OPENEND3");
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
 
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -240,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
         notificationPrelay.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "59")});
         duration.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "45")});
 
+
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
             @Override
             public String format(int i) {
@@ -247,15 +256,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
+        final EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
         // Selection of the spinner
-        Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-        Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-        Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+        final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+        final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+        final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
         // Application of the Array to the Spinner
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBuses);
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
         routeSpinner1.setAdapter(spinnerArrayAdapter);
@@ -275,7 +284,45 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        System.out.println("LADOMG TAG : "+name.getTag());
+        stopNumberText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+
+                routeSpinner1.setEnabled(false);
+                routeSpinner2.setEnabled(false);
+                routeSpinner3.setEnabled(false);
+                routeSpinner1.setClickable(false);
+                routeSpinner2.setClickable(false);
+                routeSpinner3.setClickable(false);
+
+                allBusesDisplay.removeAll(allBusesDisplay);
+                customView.requestLayout();
+
+                currentInc ++;
+                final int snapInc = currentInc;
+                try {
+                    if (s.length() > 0) {
+                        RouteLister RL = new RouteLister(
+                                mContext,
+                                stopNumberText.getText().toString(),
+                                customView,
+                                snapInc
+                        );
+                        RL.execute();
+                    }
+                }catch(Exception e){}
+            }
+        });
 
         // Get a reference for the custom view save button
         Button saveButton = (Button) customView.findViewById(R.id.save_button);
@@ -312,8 +359,6 @@ public class MainActivity extends AppCompatActivity {
 
                 name.setText(row.getString("name"));
                 name.setTag(row.getString("active"));
-                System.out.println("SETTING TAG : "+row.getString("active"));
-                System.out.println("GETTING TAG : "+name.getTag());
                 minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
                 hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
 
@@ -374,9 +419,9 @@ public class MainActivity extends AppCompatActivity {
             EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
             // Selection of the spinner
-            Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-            Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-            Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+            final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+            final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+            final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
 
             String route1 = routeSpinner1.getSelectedItem().toString();
             String route2 = routeSpinner2.getSelectedItem().toString();
@@ -491,4 +536,157 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
+    private class RouteLister extends AsyncTask<String, Integer, String> {
+
+        // static String FILENAME = "test.txt";
+        HttpURLConnection conn;
+        URL url;
+        String stopNumber;
+        Context context;
+        int READ_TIMEOUT = 2200;
+        int CONNECTION_TIMEOUT = 2200;
+        String routeList = "";
+        ArrayAdapter<String> spinnerData;
+        View customView;
+        int snapInc=0;
+
+        public RouteLister(
+                Context context,
+                String stopNumber,
+                View customView,
+                int snapInc) {
+            super();
+            this.snapInc=snapInc;
+            this.customView=customView;
+            this.context = context;
+            this.spinnerData = spinnerData;
+            this.stopNumber = stopNumber;
+        }
+
+        @Override
+        protected String doInBackground(String... str) {
+
+            if (snapInc == currentInc) {
+                try {
+
+                    // Enter URL address where your php file resides
+                    url = new URL("https://tippit.eu/public/json/stop_" + stopNumber + ".json");
+                    //url = new URL("https://imaga.me/test.php");
+                } catch (MalformedURLException e) {
+
+                    // TODO Auto-generated catch block
+                    // e.printStackTrace();
+
+                    return e.toString();
+                }
+                try {
+
+                    // Setup HttpURLConnection class to send and receive data from php
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(READ_TIMEOUT);
+                    conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                    conn.setRequestMethod("GET");
+
+                    // setDoOutput to true as we recieve data from json file
+                    conn.setDoOutput(false);
+
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+
+                    return "";
+                }
+
+                try {
+                    int response_code = conn.getResponseCode();
+
+                    // Check if successful connection made
+                    if (response_code == HttpURLConnection.HTTP_OK) {
+                        try {
+                            // Read data sent from server
+                            InputStream input = conn.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                            StringBuilder result = new StringBuilder();
+                            String line;
+
+                            while ((line = reader.readLine()) != null) {
+                                result.append(line);
+                            }
+
+                            routeList = result.toString();
+
+                            System.out.println(routeList);
+                            // Pass data to onPostExecute method
+                            return (result.toString());
+                        } catch (Exception e) {
+
+                            return ("unsuccessful");
+                        }
+
+                    } else {
+
+                        return ("unsuccessful");
+                    }
+
+                } catch (Exception e) {
+                    //sendNotification(context, "ERROR 4" +  e.getClass().getSimpleName());
+                    //e.printStackTrace();
+
+                    return "";
+                } finally {
+                    //  setAlarms(context, 0);
+                    conn.disconnect();
+                }
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (snapInc == currentInc) {
+                try {
+                    super.onPostExecute(s);
+                    if (routeList != null)
+                        if (routeList.length() > 1) {
+                            customView.requestLayout();
+                            allBusesDisplay.removeAll(allBusesDisplay);
+                            JSONArray ja = new JSONArray(routeList);
+                            for (int i = 0; i < ja.length(); i++) {
+                                customView.requestLayout();
+                                String valueString = ja.get(i).toString();
+                                allBusesDisplay.add(valueString);
+                            }
+
+                        }
+                    allBusesDisplay.add("----------");
+                    customView.requestLayout();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    customView.requestLayout();
+                    allBusesDisplay.addAll(allBuses);
+                    allBusesDisplay.remove("select");
+                    allBusesDisplay.add(0, "select");
+
+                    final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
+                    final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
+                    final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
+
+                    routeSpinner1.setSelection(0);
+                    routeSpinner2.setSelection(0);
+                    routeSpinner3.setSelection(0);
+
+                    routeSpinner1.setEnabled(true);
+                    routeSpinner2.setEnabled(true);
+                    routeSpinner3.setEnabled(true);
+                    routeSpinner1.setClickable(true);
+                    routeSpinner2.setClickable(true);
+                    routeSpinner3.setClickable(true);
+                }
+            }
+        }
+    }
 }
