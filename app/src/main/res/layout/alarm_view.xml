@@ -245,72 +245,6 @@
     </TableLayout>
 
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:background="@color/secondaryColor"
-        android:padding="0dp"
-        android:shrinkColumns="*"  android:stretchColumns="*">
-        <TableRow>
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/buttonHeight"
-                android:textSize="18sp"
-                android:gravity="left"
-                android:paddingTop="20dp"
-                android:paddingLeft="20dp"
-                android:height="46dp"
-                android:singleLine="true"
-                android:layout_span="6"
-                android:textColor="#777779"
-                android:text="Bus route(s):"/>
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/buttonHeight"
-                android:textSize="12sp"
-                android:gravity="left"
-                android:paddingTop="20dp"
-                android:paddingLeft="20dp"
-                android:height="46dp"
-                android:singleLine="true"
-                android:layout_span="6"
-                android:textColor="#777779"
-                android:text="(Leave blank for all routes)"/>
-        </TableRow>
-    </TableLayout>
-
-
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:shrinkColumns="*"  android:stretchColumns="*">
-        <TableRow>
-            <Spinner
-                android:id="@+id/bus_routes_list1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="4"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dialog"/>
-
-                <Spinner
-                android:id="@+id/bus_routes_list2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="4"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dialog"/>
-
-                <Spinner
-                android:id="@+id/bus_routes_list3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="4"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dialog"/>
-        </TableRow>
-    </TableLayout>
 
     <TableLayout
         android:layout_width="fill_parent"
@@ -428,6 +362,74 @@
         </TableRow>
 
     </TableLayout>
+
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@color/secondaryColor"
+            android:padding="0dp"
+            android:shrinkColumns="*"  android:stretchColumns="*">
+            <TableRow>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/buttonHeight"
+                    android:textSize="18sp"
+                    android:gravity="left"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="20dp"
+                    android:height="46dp"
+                    android:singleLine="true"
+                    android:layout_span="6"
+                    android:textColor="#777779"
+                    android:text="Bus route(s):"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/buttonHeight"
+                    android:textSize="12sp"
+                    android:gravity="left"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="20dp"
+                    android:height="46dp"
+                    android:singleLine="true"
+                    android:layout_span="6"
+                    android:textColor="#777779"
+                    android:text="(Leave blank for all routes)"/>
+            </TableRow>
+        </TableLayout>
+
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:shrinkColumns="*"  android:stretchColumns="*">
+            <TableRow>
+                <Spinner
+                    android:id="@+id/bus_routes_list1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="4"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:spinnerMode="dialog"/>
+
+                <Spinner
+                    android:id="@+id/bus_routes_list2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="4"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:spinnerMode="dialog"/>
+
+                <Spinner
+                    android:id="@+id/bus_routes_list3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="4"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:spinnerMode="dialog"/>
+            </TableRow>
+        </TableLayout>
 
     <TableLayout
         android:layout_width="fill_parent"
