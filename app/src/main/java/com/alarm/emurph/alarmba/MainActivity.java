@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             "142","145","150","151","161","184","185","220","236","238","239",
             "270","747","757"
     };
-
+    String stopVal = "0";
     String r1,r2,r3 = "select";
 
     ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
@@ -291,6 +291,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
+        // Get a reference for the custom view save button
+        final Button saveButton = (Button) customView.findViewById(R.id.save_button);
+        // Get a reference for the custom view delete button
+        Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
 
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
@@ -306,7 +310,10 @@ public class MainActivity extends AppCompatActivity {
         routeSpinner1.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                r1 = routeSpinner1.getSelectedItem().toString();
+                if (routeSpinner1.isEnabled())
+                    r1 = routeSpinner1.getSelectedItem().toString();
+                System.out.println("CHANGED TO"+r1);
+
             }
 
             @Override
@@ -320,21 +327,22 @@ public class MainActivity extends AppCompatActivity {
         routeSpinner2.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                r2 = routeSpinner2.getSelectedItem().toString();
+                if (routeSpinner2.isEnabled())
+                    r2 = routeSpinner2.getSelectedItem().toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
                 // your code here
             }
-
         });
 
 
         routeSpinner3.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                r3 = routeSpinner3.getSelectedItem().toString();
+                if (routeSpinner3.isEnabled())
+                    r3 = routeSpinner3.getSelectedItem().toString();
             }
 
             @Override
@@ -346,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
 
         allBusesDisplay.addAll(allBusesDisplay);
         try {
-        final String stopVal = (row == null) ? "0" : row.getString("stop_number");
+        stopVal = (row == null) ? "0" : row.getString("stop_number");
 
         stopNumberText.addTextChangedListener(new TextWatcher() {
 
@@ -363,48 +371,62 @@ public class MainActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
                 try {
-                    int st = Integer.parseInt(stopNumberText.getText().toString());
-                    System.out.println("STOP: " + stopNumberText.getText() + "    stop: " + stopVal);
-                    if (st != 0 && st != Integer.parseInt(stopVal)) {
-                        System.out.println("IN: " + stopNumberText.getText() + "    IN: " + stopVal);
-                        routeSpinner1.setEnabled(false);
-                        routeSpinner2.setEnabled(false);
-                        routeSpinner3.setEnabled(false);
-                        routeSpinner1.setClickable(false);
-                        routeSpinner2.setClickable(false);
-                        routeSpinner3.setClickable(false);
+                    String stStr = stopNumberText.getText().toString();
+                    System.out.println("String : " + stStr);
+                    if (stStr.length() > 0) {
+                        System.out.println("OK : " + stStr);
 
-                        allBusesDisplay.removeAll(allBusesDisplay);
-                        customView.requestLayout();
+                        int st = Integer.parseInt(stStr);
+                        if (st != 0 && st != Integer.parseInt(stopVal)) {
+                            stopVal = st+"";
+                            System.out.println("OK2 : " + stStr);
 
-                        currentInc++;
-                        final int snapInc = currentInc;
-                        try {
-                            if (s.length() > 0) {
-                                RouteLister RL = new RouteLister(
-                                        mContext,
-                                        stopNumberText.getText().toString(),
-                                        customView,
-                                        snapInc
-                                );
-                                RL.execute();
+                            System.out.println("S1 : " + r1 + "+" + r2 + "+" + r3);
+
+                            customView.requestLayout();
+                            routeSpinner1.setEnabled(false);
+                            routeSpinner2.setEnabled(false);
+                            routeSpinner3.setEnabled(false);
+                            routeSpinner1.setClickable(false);
+                            routeSpinner2.setClickable(false);
+                            routeSpinner3.setClickable(false);
+
+                            saveButton.setEnabled(false);
+                            saveButton.setClickable(false);
+
+                            customView.requestLayout();
+
+                            allBusesDisplay.removeAll(allBusesDisplay);
+
+                            customView.requestLayout();
+                            currentInc++;
+                            final int snapInc = currentInc;
+                            try {
+                                if (s.length() > 0) {
+                                    RouteLister RL = new RouteLister(
+                                            mContext,
+                                            stopNumberText.getText().toString(),
+                                            customView,
+                                            snapInc
+                                    );
+                                    RL.execute();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
+                    else {
+                        System.out.println("CANNOT CONVERT ================  : " + stStr);
+                    }
                 }catch(Exception e){
-
                     e.printStackTrace();
-
                 }
             }
         });
     }catch (Exception e){
             e.printStackTrace();
         }
-        // Get a reference for the custom view save button
-        Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
         final JSONObject rowToSend = row;
         // Set a click listener for the popup window save button
@@ -419,8 +441,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (row != null) {
-            // Get a reference for the custom view delete button
-            Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
             try {
 
                 deleteButton.setBackgroundColor(Color.parseColor("#990000"));
@@ -452,11 +472,10 @@ public class MainActivity extends AppCompatActivity {
                 stopNumberText.setText(row.getString("stop_number"));
 
                 JSONObject routes = row.getJSONObject("routes");
-                System.out.println("---R1 " +routes.getString("r1")+" R2 "+routes.getString("r2")+" R3 "+routes.getString("r3"));
 
-                r1 = routes.getString("r1");
-                r2 = routes.getString("r2");
-                r3 = routes.getString("r3");
+                r1 = routes.getString("r1").toLowerCase();
+                r2 = routes.getString("r2").toLowerCase();
+                r3 = routes.getString("r3").toLowerCase();
                 int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
                 routeSpinner1.setSelection(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(r2);
@@ -689,14 +708,11 @@ public class MainActivity extends AppCompatActivity {
 
                             routeList = result.toString();
 
-                            System.out.println(routeList);
                             // Pass data to onPostExecute method
                             return (result.toString());
                         } catch (Exception e) {
-
                             return ("unsuccessful");
                         }
-
                     } else {
 
                         return ("unsuccessful");
@@ -723,12 +739,17 @@ public class MainActivity extends AppCompatActivity {
                     if (routeList != null)
                         if (routeList.length() > 1) {
                             customView.requestLayout();
+                            System.out.println("ROUTELIST: "+routeList);
                             allBusesDisplay.removeAll(allBusesDisplay);
-                            JSONArray ja = new JSONArray(routeList);
-                            for (int i = 0; i < ja.length(); i++) {
-                                customView.requestLayout();
-                                String valueString = ja.get(i).toString();
-                                allBusesDisplay.add(valueString);
+                            JSONArray stopDataJson = new JSONArray(routeList);
+                            if (stopDataJson != null) {
+                                JSONArray ja = stopDataJson.getJSONArray(0);
+                                if (ja != null)
+                                for (int i = 0; i < ja.length(); i++) {
+                                    customView.requestLayout();
+                                    String valueString = ja.get(i).toString();
+                                    allBusesDisplay.add(valueString);
+                                }
                             }
 
                         }
@@ -746,14 +767,7 @@ public class MainActivity extends AppCompatActivity {
                     final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
                     final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
                     final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
-
-
-                    int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
-                    routeSpinner1.setSelection(spinnerPosition);
-                    spinnerPosition = spinnerArrayAdapter.getPosition(r2);
-                    routeSpinner2.setSelection(spinnerPosition);
-                    spinnerPosition = spinnerArrayAdapter.getPosition(r3);
-                    routeSpinner3.setSelection(spinnerPosition);
+                    final Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
 
                     routeSpinner1.setEnabled(true);
@@ -762,6 +776,16 @@ public class MainActivity extends AppCompatActivity {
                     routeSpinner1.setClickable(true);
                     routeSpinner2.setClickable(true);
                     routeSpinner3.setClickable(true);
+
+                    int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
+                    routeSpinner1.setSelection(spinnerPosition);
+                    spinnerPosition = spinnerArrayAdapter.getPosition(r2);
+                    routeSpinner2.setSelection(spinnerPosition);
+                    spinnerPosition = spinnerArrayAdapter.getPosition(r3);
+                    routeSpinner3.setSelection(spinnerPosition);
+
+                    saveButton.setEnabled(true);
+                    saveButton.setClickable(true);
                 }
             }
         }
