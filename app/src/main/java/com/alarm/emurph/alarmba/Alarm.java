@@ -293,7 +293,7 @@ public class Alarm extends BroadcastReceiver {
                                 int notificationPrelay = Integer.parseInt(currentAlarmData.getString("notification_prelay"));
 
                                 if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
-                                    if (duetime == notificationPrelay) {
+                                    if (duetime == notificationPrelay || duetime == notificationPrelay-1) {
                                         sendNotification(context, busRoute + " arriving to stop " + stopNumber + " in " + notificationPrelay + " mins");
                                     }
                                 }

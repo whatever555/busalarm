@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (alarmData.isActive(row))
                 {
-                    editAlarmTR.setBackgroundColor(Color.RED);
+                    alarmView.setBackgroundColor(Color.RED);
                 }
 
                 editAlarmTR.setOnClickListener(new View.OnClickListener() {

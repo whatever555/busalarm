@@ -13,7 +13,6 @@
         android:layout_below="@id/alarmView"
         android:shrinkColumns="*"  android:stretchColumns="*">
 
-
         <!-- Row 2 with 12 columns -->
         <TableRow
             android:id="@+id/editAlarmTR"
