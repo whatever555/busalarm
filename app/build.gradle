@@ -29,4 +29,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'com.github.DavidProdinger:weekdays-selector:1.0.3'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+    compile 'com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1'
 }

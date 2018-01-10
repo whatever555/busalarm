@@ -217,6 +217,12 @@
         android:padding="20dp"
         android:shrinkColumns="*"  android:stretchColumns="*">
         <TableRow>
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/stop_number_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="8" />
+
             <EditText
                 android:id="@+id/stop_number"
                 android:textSize="22sp"
@@ -226,16 +232,17 @@
                 android:textColor="#777779"
                 android:backgroundTint="@color/primaryColor"
                 android:inputType="number"
-                android:layout_span="4"
+                android:layout_span="3"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:text="0">
             </EditText>
+
             <TextView
                 android:textSize="1sp"
                 android:gravity="left"
                 android:height="46dp"
-                android:layout_span="8"
+                android:layout_span="1"
                 android:singleLine="true"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
