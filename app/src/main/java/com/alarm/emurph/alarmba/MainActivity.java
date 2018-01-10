@@ -38,7 +38,6 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
-import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -279,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
         final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
         final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
         final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
-        final SearchableSpinner searchSpinner = (SearchableSpinner) customView.findViewById(R.id.stop_number_spinner);
 
         // Application of the Array to the Spinner
         spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
@@ -288,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
         routeSpinner1.setAdapter(spinnerArrayAdapter);
         routeSpinner2.setAdapter(spinnerArrayAdapter);
         routeSpinner3.setAdapter(spinnerArrayAdapter);
-        searchSpinner.setAdapter(spinnerArrayAdapter);
 
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
@@ -297,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view delete button
         Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
         // Get a reference for the custom view nearby button
-       // final Button nearbyButton = (Button) customView.findViewById(R.id.nearby_button);
+        final Button nearbyButton = (Button) customView.findViewById(R.id.nearby_button);
 
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
@@ -307,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
                 mPopupWindow.dismiss();
             }
         });
+
 
         routeSpinner1.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
