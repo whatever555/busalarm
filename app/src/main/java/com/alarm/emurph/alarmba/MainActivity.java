@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -37,6 +40,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -62,7 +66,6 @@ import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
 public class MainActivity extends AppCompatActivity {
     Context mContext = this;
-    ArrayAdapter<String> spinnerArrayAdapter;
     int currentInc = 0;
     Button routeBtn1,routeBtn2,routeBtn3;
     String[] stopsList = new String[]{
@@ -103,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        for(int i =1; i<=71; i++) {
+            allBusesDisplay.add("LUAS" + i);
+            allBuses.add("LUAS" + i);
+        }
         alarmData = new AlarmData();
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
@@ -289,31 +296,22 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
-        // Application of the Array to the Spinner
-        spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
         final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
                 MainActivity.this,
-                spinnerArrayAdapter,
                 "Select route:",
-                R.style.DialogAnimations_SmileWindow,
-                mContext
+                R.style.DialogAnimations_SmileWindow
         );// With 	Animation
 
         final RouteSpinnerDialog routeSpinner2 = new RouteSpinnerDialog(
                 MainActivity.this,
-                spinnerArrayAdapter,
                 "Select route:",
-                R.style.DialogAnimations_SmileWindow,
-                mContext
+                R.style.DialogAnimations_SmileWindow
         );// With 	Animation
         final RouteSpinnerDialog routeSpinner3 = new RouteSpinnerDialog(
                 MainActivity.this,
-                spinnerArrayAdapter,
                 "Select route:",
-                R.style.DialogAnimations_SmileWindow,
-                mContext
+                R.style.DialogAnimations_SmileWindow
         );// With 	Animation
 
 
@@ -370,7 +368,13 @@ public class MainActivity extends AppCompatActivity {
         stopSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchSpinnerDialog.showSpinerDialog();
+                if (isNetworkAvailable()){
+                    searchSpinnerDialog.showSpinerDialog();
+                }
+                else {
+                    Toast.makeText(mContext, "Requires internet connection \nPlease enter manually",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
         // Set a click listener for the popup window close button
@@ -387,6 +391,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 routeSpinner1.showSpinerDialog();
+
             }
         });
         routeBtn2.setOnClickListener(new View.OnClickListener() {
@@ -402,7 +407,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        allBusesDisplay.addAll(allBusesDisplay);
+        //TODO should this be commented out
+        //allBusesDisplay.addAll(allBusesDisplay);
         try {
         stopVal = (row == null) ? "0" : row.getString("stop_number");
 
@@ -426,10 +432,8 @@ public class MainActivity extends AppCompatActivity {
                     if (stStr.length() > 0) {
                         System.out.println("OK : " + stStr);
 
-                        int st = Integer.parseInt(stStr);
-                        if (st != 0 && st != Integer.parseInt(stopVal)) {
-                            stopVal = st+"";
-                            System.out.println("OK2 : " + stStr);
+                        if (!stStr.equals("0") && !stStr.equals(stopVal)) {
+                            stopVal = stStr;
 
                             System.out.println("S1 : " + r1 + "+" + r2 + "+" + r3);
 
@@ -815,26 +819,20 @@ public class MainActivity extends AppCompatActivity {
 
                     final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
                             MainActivity.this,
-                            spinnerArrayAdapter,
                             "1",
-                            R.style.DialogAnimations_SmileWindow,
-                            mContext
+                            R.style.DialogAnimations_SmileWindow
                     );// With 	Animation
 
                     final RouteSpinnerDialog routeSpinner2 = new RouteSpinnerDialog(
                             MainActivity.this,
-                            spinnerArrayAdapter,
                             "1",
-                            R.style.DialogAnimations_SmileWindow,
-                            mContext
+                            R.style.DialogAnimations_SmileWindow
                     );// With 	Animation
 
                     final RouteSpinnerDialog routeSpinner3 = new RouteSpinnerDialog(
                             MainActivity.this,
-                            spinnerArrayAdapter,
                             "1",
-                            R.style.DialogAnimations_SmileWindow,
-                            mContext
+                            R.style.DialogAnimations_SmileWindow
                     );// With 	Animation
 
                     final Button saveButton = (Button) customView.findViewById(R.id.save_button);
@@ -911,6 +909,10 @@ public class MainActivity extends AppCompatActivity {
                             pos = j;
                         }
                     }
+
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                     onSpinerItemClick.onClick(t.getText().toString(), pos);
                     alertDialog.dismiss();
                 }
@@ -1110,22 +1112,16 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog;
         int pos;
         int style;
-        Context mContext;
-        ArrayAdapter<String> spinnerArrayAdaptor;
 
-        public RouteSpinnerDialog(Activity activity, ArrayAdapter<String> spinnerArrayAdaptor, String dialogTitle, Context mContext) {
+        public RouteSpinnerDialog(Activity activity, String dialogTitle) {
             this.context = activity;
-            this.spinnerArrayAdaptor = spinnerArrayAdaptor;
             this.dTitle = dialogTitle;
-            this.mContext = mContext;
         }
 
-        public RouteSpinnerDialog(Activity activity, ArrayAdapter<String> spinnerArrayAdaptor, String dialogTitle, int style, Context mContext) {
+        public RouteSpinnerDialog(Activity activity, String dialogTitle, int style) {
             this.context = activity;
-            this.spinnerArrayAdaptor = spinnerArrayAdaptor;
             this.dTitle = dialogTitle;
             this.style = style;
-            this.mContext = mContext;
         }
 
         public void setEnabled(boolean b){
@@ -1150,16 +1146,15 @@ public class MainActivity extends AppCompatActivity {
             TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
             TextView title = (TextView) v.findViewById(R.id.spinerTitle);
             title.setText(dTitle);
-            ListView listView = (ListView) v.findViewById(R.id.list);
+            final ListView listView = (ListView) v.findViewById(R.id.list);
             final EditText searchBox = (EditText) v.findViewById(R.id.searchBox);
 
-            spinnerArrayAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allBusesDisplay);
-            listView.setAdapter(spinnerArrayAdaptor);
 
             adb.setView(v);
             alertDialog = adb.create();
             alertDialog.getWindow().getAttributes().windowAnimations = style;//R.style.DialogAnimations_SmileWindow;
-            alertDialog.setCancelable(false);
+            alertDialog.setCancelable(true);
+
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -1171,9 +1166,16 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     onSpinerItemClick.onClick(t.getText().toString(), pos);
+
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                     alertDialog.dismiss();
                 }
             });
+
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, R.layout.items_view, allBusesDisplay);
+            listView.setAdapter(spinnerArrayAdapter);
 
             searchBox.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -1183,12 +1185,10 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
                 }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    System.out.println("ROUTE TEXT CHANGED");
                     spinnerArrayAdapter.getFilter().filter(searchBox.getText().toString());
                 }
             });
@@ -1204,4 +1204,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }
