@@ -14,16 +14,7 @@
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/buttonHeight"
-            android:textSize="18sp"
-            android:gravity="left"
-            android:paddingTop="20dp"
-            android:paddingLeft="20dp"
-            android:height="46dp"
-            android:singleLine="true"
-            android:layout_span="12"
-            android:textColor="#777779"
+            style="@style/h1"
             android:text="Schedule notification"/>
     </TableRow>
 </TableLayout>
@@ -80,16 +71,7 @@
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/buttonHeight"
-        android:textSize="18sp"
-        android:gravity="left"
-        android:paddingTop="20dp"
-        android:paddingLeft="20dp"
-        android:height="46dp"
-        android:singleLine="true"
-        android:layout_span="12"
-        android:textColor="#777779"
+        style="@style/h1"
         android:text="Scheduled time for notifications"/>
     </TableRow>
 </TableLayout>
@@ -138,16 +120,7 @@
     android:shrinkColumns="*"  android:stretchColumns="*">
     <TableRow>
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/buttonHeight"
-            android:textSize="18sp"
-            android:gravity="left"
-            android:paddingTop="20dp"
-            android:paddingLeft="20dp"
-            android:height="46dp"
-            android:singleLine="true"
-            android:layout_span="12"
-            android:textColor="#777779"
+            style="@style/h1"
             android:text="Disable after: (minutes):"/>
     </TableRow>
 </TableLayout>
@@ -197,16 +170,7 @@
         android:shrinkColumns="*"  android:stretchColumns="*">
         <TableRow>
             <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/buttonHeight"
-                android:textSize="18sp"
-                android:gravity="left"
-                android:paddingTop="20dp"
-                android:paddingLeft="20dp"
-                android:height="46dp"
-                android:singleLine="true"
-                android:layout_span="12"
-                android:textColor="#777779"
+                style="@style/h1"
                 android:text="Stop ID:"/>
         </TableRow>
     </TableLayout>
@@ -255,16 +219,7 @@
         android:shrinkColumns="*"  android:stretchColumns="*">
         <TableRow>
             <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/buttonHeight"
-                android:textSize="18sp"
-                android:gravity="left"
-                android:paddingTop="20dp"
-                android:paddingLeft="20dp"
-                android:height="46dp"
-                android:singleLine="true"
-                android:layout_span="12"
-                android:textColor="#777779"
+                style="@style/h1"
                 android:text="Set days:"/>
         </TableRow>
     </TableLayout>
@@ -373,16 +328,7 @@
             android:shrinkColumns="*"  android:stretchColumns="*">
             <TableRow>
                 <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="@dimen/buttonHeight"
-                    android:textSize="18sp"
-                    android:gravity="left"
-                    android:paddingTop="20dp"
-                    android:paddingLeft="20dp"
-                    android:height="46dp"
-                    android:singleLine="true"
-                    android:layout_span="6"
-                    android:textColor="#777779"
+                    style="@style/h1"
                     android:text="Track route(s):"/>
                 <TextView
                     android:layout_width="fill_parent"
@@ -411,7 +357,7 @@
                     android:layout_width="wrap_content"
                     android:layout_gravity="left"
                     android:layout_height="@dimen/buttonHeight"
-                    android:layout_span="8"
+                    android:layout_span="4"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp"
                     android:background="@color/buttonBack"
@@ -435,7 +381,7 @@
                     android:layout_width="wrap_content"
                     android:layout_gravity="right"
                     android:layout_height="@dimen/buttonHeight"
-                    android:layout_span="8"
+                    android:layout_span="4"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp"
                     android:background="@color/buttonBack"
