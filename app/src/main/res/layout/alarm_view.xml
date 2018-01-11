@@ -6,37 +6,24 @@
 
     <TableLayout
         android:id="@+id/top_sticky_label"
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:background="@color/primaryColor"
-        android:padding="0dp"
-        android:shrinkColumns="*"
-        android:stretchColumns="*">
-
+        style="@style/stickyTableLayoutHeading">
         <TableRow>
-
             <TextView
-                style="@style/h1"
+                style="@style/h1_sticky"
                 android:text="Schedule notification" />
         </TableRow>
     </TableLayout>
 
     <ScrollView
         android:id="@+id/addAlarmScreen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/top_sticky_label"
-        android:background="@color/mainBack"
-        android:fillViewport="true">
+        style="@style/mainScroll">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TableLayout
-                style="@style/basicTableLayoutContent"
-               >
+            <TableLayout style="@style/basicTableLayoutContent">
                 <!-- Row 1 with single column -->
                 <TableRow
                     android:layout_width="fill_parent"
@@ -51,23 +38,134 @@
 
                     <EditText
                         android:id="@+id/name"
-                        android:layout_width="fill_parent"
+                        style="@style/editText"
                         android:layout_height="@dimen/buttonHeight"
-                        android:layout_span="12"
-                        android:backgroundTint="@color/secondaryColor"
-                        android:gravity="left"
                         android:hint="Notification name"
-                        android:inputType="text"
                         android:padding="7dp"
-                        android:singleLine="true"
-                        android:textColor="#777779"
                         android:textSize="22sp"></EditText>
                 </TableRow>
             </TableLayout>
 
 
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
+            <TableLayout style="@style/basicTableLayoutHeading">
+
+                <TableRow>
+
+                    <TextView
+                        style="@style/h1"
+                        android:text="Stop ID:" />
+                </TableRow>
+
+            </TableLayout>
+
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
+                <TableRow>
+
+                    <EditText
+                        android:id="@+id/stop_number"
+                        style="@style/editText"
+                        android:layout_span="6"
+                        android:text="123"
+                        android:textSize="22sp"></EditText>
+
+                    <Button
+                        android:id="@+id/stop_search_button"
+                        style="@style/basicButton"
+                        android:layout_gravity="right"
+                        android:paddingLeft="40dp"
+                        android:paddingRight="40dp"
+                        android:layout_span="6"
+                        android:text="Search..."/>
+
+                </TableRow>
+            </TableLayout>
+
+
+            <TableLayout style="@style/basicTableLayoutHeading">
+                <TableRow>
+                    <TextView
+                        style="@style/h1"
+                        android:text="Notify me for.." />
+                </TableRow>
+            </TableLayout>
+
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
+                <TableRow>
+                    <EditText
+                        android:id="@+id/alarm_duration"
+                        style="@style/editText"
+                        android:layout_span="5"
+                        android:inputType="number"
+                        android:layout_gravity="right"
+                        android:text="15"></EditText>
+
+                    <TextView
+                        style="@style/basicText"
+                        android:layout_span="7"
+                        android:layout_gravity="left"
+                        android:text="minutes:"
+                        android:textSize="20sp" />
+
+                </TableRow>
+            </TableLayout>
+
+
+            <TableLayout style="@style/basicTableLayoutHeading">
+                <TableRow>
+                    <TextView
+                        style="@style/h1"
+                        android:text="Route(s) to track:" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        style="@style/basicText"
+                        android:layout_span="12"
+                        android:layout_gravity="center"
+                        android:text="(Leave blank for all routes)"
+                        android:textSize="12sp" />
+                </TableRow>
+
+            </TableLayout>
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
+                <TableRow>
+
+                    <Button
+                        android:id="@+id/route1_button"
+                        style="@style/basicButton"
+                        android:layout_span="4"
+                        android:layout_gravity="left"
+                        android:text="select"
+                        />
+
+                    <Button
+                        android:id="@+id/route2_button"
+                        style="@style/basicButton"
+                        android:layout_gravity="center"
+                        android:text="select"
+                        android:layout_span="4"/>
+
+                    <Button
+                        android:id="@+id/route3_button"
+                        style="@style/basicButton"
+                        android:layout_span="4"
+                        android:text="select"
+                        android:layout_gravity="right"/>
+                </TableRow>
+            </TableLayout>
+
+
+
+
+            <TableLayout style="@style/basicTableLayoutHeading">
 
                 <TableRow>
 
@@ -75,10 +173,12 @@
                         style="@style/h1"
                         android:text="Scheduled time for notifications" />
                 </TableRow>
-            </TableLayout>
 
-            <TableLayout
-                style="@style/basicTableLayoutContent">
+            </TableLayout>
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
                 <TableRow
                     android:layout_width="fill_parent"
                     android:layout_height="100dp"
@@ -98,122 +198,31 @@
 
                     <ToggleButton
                         android:id="@+id/ampm"
-                        android:layout_width="wrap_content"
-                        android:layout_centerInParent="true"
+                        style="@style/basicToggle"
                         android:layout_span="4"
                         android:height="25dp"
-                        android:background="@color/buttonBack"
-                        android:gravity="center"
-                        android:textColor="@color/buttonText"
                         android:textOff="AM"
                         android:textOn="PM" />
                 </TableRow>
             </TableLayout>
 
 
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
+
+
+            <TableLayout style="@style/basicTableLayoutHeading">
 
                 <TableRow>
 
                     <TextView
                         style="@style/h1"
-                        android:text="Disable after: (minutes):" />
+                        android:text="Days:" />
                 </TableRow>
+
             </TableLayout>
+            <View style="@style/basicDivider"></View>
 
+            <TableLayout style="@style/basicTableLayoutContent">
 
-
-            <TableLayout
-                style="@style/basicTableLayoutContent">
-                <TableRow>
-
-                    <EditText
-                        android:id="@+id/alarm_duration"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_span="4"
-                        android:backgroundTint="@color/primaryColor"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:padding="7dp"
-                        android:singleLine="true"
-                        android:text="15"
-                        android:textColor="#777779"
-                        android:textSize="22sp"></EditText>
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_span="8"
-                        android:height="46dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="minutes:"
-                        android:textColor="#777779"
-                        android:textSize="1sp" />
-
-                </TableRow>
-            </TableLayout>
-
-
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
-
-                <TableRow>
-
-                    <TextView
-                        style="@style/h1"
-                        android:text="Stop ID:" />
-                </TableRow>
-            </TableLayout>
-
-
-            <TableLayout
-                style="@style/basicTableLayoutContent">
-                <TableRow>
-                    <EditText
-                        android:id="@+id/stop_number"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_span="4"
-                        android:backgroundTint="@color/primaryColor"
-                        android:gravity="center"
-                        android:padding="7dp"
-                        android:singleLine="true"
-                        android:text="0"
-                        android:textColor="#777779"
-                        android:textSize="22sp"></EditText>
-
-
-                    <Button
-                        android:id="@+id/stop_search_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_gravity="right"
-                        android:layout_span="8"
-                        android:background="@color/buttonBack"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="Search..."
-                        android:textColor="@color/buttonText" />
-
-                </TableRow>
-            </TableLayout>
-
-
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
-                <TableRow>
-
-                    <TextView
-                        style="@style/h1"
-                        android:text="Set days:" />
-                </TableRow>
-            </TableLayout>
-
-            <TableLayout
-                style="@style/basicTableLayoutContent">
                 <TableRow>
 
                     <com.dpro.widgets.WeekdaysPicker
@@ -229,192 +238,100 @@
                 </TableRow>
             </TableLayout>
 
-
-            <TableLayout
-                style="@style/basicTableLayoutContent">
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="100dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_span="6"
-                        android:text="Repeat weekly:"
-                        android:textSize="20dp" />
-
-                    <ToggleButton
-                        android:id="@+id/repeat_toggle"
-                        android:layout_width="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_span="6"
-                        android:height="25dp"
-                        android:background="@color/buttonBack"
-                        android:gravity="center"
-                        android:textColor="@color/buttonText"
-                        android:textOff="Yes"
-                        android:textOn="No" />
-                </TableRow>
-            </TableLayout>
-
-
-
-            <TableLayout
-                style="@style/basicTableLayoutContent">
-
-
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="100dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_span="1"
-                        android:gravity="left"
-                        android:text="Notify "
-                        android:textSize="16dp" />
-
-                    <EditText
-                        android:id="@+id/notification_prelay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_span="1"
-                        android:backgroundTint="@color/primaryColor"
-                        android:gravity="left"
-                        android:inputType="number"
-                        android:singleLine="true"
-                        android:text="5"
-                        android:textColor="#777779"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_span="8"
-                        android:gravity="left"
-                        android:text=" minutes before arrival"
-                        android:textSize="16dp" />
-                </TableRow>
-
-            </TableLayout>
-
-
-
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
+            <TableLayout style="@style/basicTableLayoutHeading">
 
                 <TableRow>
 
                     <TextView
                         style="@style/h1"
-                        android:text="Track route(s):" />
+                        android:text="Repeat:" />
+                </TableRow>
+
+            </TableLayout>
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="100dp"
+                    android:gravity="center_vertical">
+
+                    <ToggleButton
+                        android:id="@+id/repeat_toggle"
+                        style="@style/basicToggle"
+                        android:layout_span="12"
+                        android:height="25dp"
+                        android:textOff="Off"
+                        android:textOn="On" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout style="@style/basicTableLayoutHeading">
+                <TableRow>
+                    <TextView
+                        style="@style/h1"
+                        android:text="Send notification:" />
+                </TableRow>
+            </TableLayout>
+
+            <View style="@style/basicDivider"></View>
+
+            <TableLayout style="@style/basicTableLayoutContent">
+
+                <TableRow>
+
+                    <EditText
+                        android:id="@+id/notification_prelay"
+                        style="@style/editText"
+                        android:layout_gravity="right"
+                        android:layout_span="3"
+                        android:inputType="number"
+                        android:text="5" />
 
                     <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_span="6"
-                        android:height="46dp"
-                        android:gravity="left"
-                        android:paddingLeft="20dp"
-                        android:paddingTop="20dp"
-                        android:singleLine="true"
-                        android:text="(Leave blank for all routes)"
-                        android:textColor="#777779"
-                        android:textSize="12sp" />
+                        style="@style/basicText"
+                        android:layout_gravity="left"
+                        android:layout_span="9"
+                        android:text="minutes before arrival:"
+                        android:textSize="20sp" />
                 </TableRow>
             </TableLayout>
 
 
-
             <TableLayout
-                style="@style/basicTableLayoutContent">
+                style="@style/stickyTableLayoutFooter"
+                android:paddingTop="0dp">
 
                 <TableRow>
 
                     <Button
-                        android:id="@+id/route1_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_gravity="left"
-                        android:layout_span="4"
-                        android:background="@color/buttonBack"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="select"
-                        android:textColor="@color/buttonText" />
-
-                    <Button
-                        android:id="@+id/route2_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_gravity="center"
-                        android:layout_span="4"
-                        android:background="@color/buttonBack"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="select"
-                        android:textColor="@color/buttonText" />
-
-                    <Button
-                        android:id="@+id/route3_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_gravity="right"
-                        android:layout_span="4"
-                        android:background="@color/buttonBack"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="select"
-                        android:textColor="@color/buttonText" />
-                </TableRow>
-            </TableLayout>
-
-
-            <TableLayout
-                style="@style/basicTableLayoutHeading">
-                <TableRow
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:stretchColumns="*">
-
-                    <Button
                         android:id="@+id/cancel_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/buttonHeight"
+                        style="@style/cancelButton"
                         android:layout_gravity="left"
                         android:layout_span="4"
-                        android:background="@color/buttonBack"
-                        android:text="Close"
-                        android:textColor="@color/buttonText" />
+                        android:text="Close" />
 
                     <Button
                         android:id="@+id/delete_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/buttonHeight"
-                        android:layout_gravity="right"
+                        style="@style/deleteButton"
+                        android:layout_gravity="center"
                         android:layout_span="4"
-                        android:background="@color/inactiveButtonBack"
-                        android:text="Delete"
-                        android:textColor="@color/inactiveButtonText" />
+                        android:text="Delete" />
 
                     <Button
                         android:id="@+id/save_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/buttonHeight"
+                        style="@style/saveButton"
                         android:layout_gravity="right"
                         android:layout_span="4"
-                        android:background="@color/addButtonBack"
-                        android:text="Save"
-                        android:textColor="@color/addButtonText" />
+                        android:text="Save" />
                 </TableRow>
-
             </TableLayout>
 
         </LinearLayout>
+
+
     </ScrollView>
+
+
 </RelativeLayout>

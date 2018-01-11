@@ -19,47 +19,135 @@
 
     <style name="DialogAnimations" />
 
+    <!-- SCROLL BARS -->
+
+
     <!-- TABLES -->
     <style name="basicTableLayout">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">6dp</item>
         <item name="android:shrinkColumns">*</item>
         <item name="android:stretchColumns">*</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingTop">28dp</item>
     </style>
 
     <style name="basicTableLayoutContent" parent="basicTableLayout">
-        <item name="android:paddingBottom">46dp</item>
+        <item name="android:paddingBottom">48dp</item>
     </style>
 
     <style name="basicTableLayoutHeading" parent="basicTableLayout">
-        <item name="android:background">#eeeefe</item>
+        <item name="android:paddingTop">20dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:background">#EEF</item>
+        <item name="android:textColor">#334</item>
 
     </style>
 
-    <!-- HEADINGS -->
-    <style name="headerText">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">@dimen/buttonHeight</item>
-        <item name="android:gravity">left</item>
-        <item name="android:paddingTop">20dp</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:textColor">#777779</item>
+    <style name="stickyTable" parent="basicTableLayout">
+        <item name="android:background">#334</item>
+        <item name="android:color">#DfDFeF</item>
+        <item name="android:textColor">#EEF</item>
+    </style>
+
+    <style name="stickyTableLayoutHeading" parent="stickyTable">
+        <item name="android:paddingBottom">20dp</item>
+        <item name="android:paddingTop">40dp</item>
+    </style>
+
+    <style name="stickyTableLayoutFooter" parent="stickyTable">
+        <item name="android:padding">8dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
+    <!-- BUTTONS -->
+    <style name="basicButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:background">#778</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#EEEEFE</item>
+        <item name="android:color">#EEEEFE</item>
         <item name="android:typeface">monospace</item>
     </style>
 
+    <style name="saveButton" parent="basicButton">
+        <item name="android:background">#4a4</item>
+    </style>
+
+    <style name="deleteButton" parent="basicButton">
+        <item name="android:background">#a44</item>
+    </style>
+
+    <style name="cancelButton" parent="basicButton">
+        <item name="android:background">#aaf</item>
+    </style>
+
+    <!--TOGGLES -->
+
+    <style name="basicToggle" parent="basicButton">
+    </style>
+
+
+    <!-- TEXT -->
+    <style name="basicText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#777779</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:gravity">center_vertical</item>
+
+    </style>
+
+
+    <style name="editText" parent="basicText">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">7dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+
+    <!-- HEADINGS -->
+    <style name="headerText" parent="basicText">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="h1" parent="@style/headerText">
-        <item name="android:textSize">18sp</item>
-        <item name="android:height">46dp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:layout_span">12</item>
     </style>
 
+    <style name="h1_sticky" parent="@style/h1">
+        <item name="android:textColor">#EEF</item>
+        <item name="android:color">#EEF</item>
+    </style>
 
-    <style name="h2">
+    <style name="h2" parent="headerText">
         <item name="android:textSize">16sp</item>
-        <item name="android:height">46dp</item>
         <item name="android:layout_span">12</item>
     </style>
+
+    <style name="mainScroll">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:fillViewport">true</item>
+        <item name="android:background">#f3f3FE</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:layout_below">@id/top_sticky_label</item>
+    </style>
+
+    <style name="basicDivider" parent="basicDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_span">12</item>
+        <item name="android:background">#e0e0Fd</item>
+    </style>
+
 
 </resources>

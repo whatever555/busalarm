@@ -4,26 +4,24 @@
     android:id="@+id/alarmView"
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:paddingBottom="12dp">
+    style="@style/basicButton"
+    android:padding="12dp">
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
         android:background="@color/secondaryColor"
+        android:padding="12dp"
         android:layout_below="@id/alarmView"
         android:shrinkColumns="*"  android:stretchColumns="*">
 
         <!-- Row 2 with 12 columns -->
         <TableRow
-            android:id="@+id/editAlarmTR"
-            android:layout_height="wrap_content"
-            android:textColor="@color/buttonText"
-            android:layout_width="fill_parent">
+            android:id="@+id/editAlarmTR">
 
             <TextView
                 android:id="@+id/editAlarm"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_span="10"
                 android:color="#333335"
@@ -37,6 +35,7 @@
                 android:checked="true"/>
 
         </TableRow>
-
     </TableLayout>
+    <View style="@style/basicDivider"></View>
+
 </LinearLayout>
