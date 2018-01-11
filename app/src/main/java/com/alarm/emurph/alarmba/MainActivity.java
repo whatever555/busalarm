@@ -321,10 +321,7 @@ public class MainActivity extends AppCompatActivity {
         searchSpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String item, int position) {
-                Toast.makeText(MainActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
-
                 String[] stopData=item.split(":");
-
                 stopNumberText.setText(stopData[0]);
             }
         });
