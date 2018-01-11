@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
         routeBtn3 = (Button) customView.findViewById(R.id.route3_button);
 
         //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",mContext);// With No Animation
-        searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
+        searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
 
         routeSpinner1.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
