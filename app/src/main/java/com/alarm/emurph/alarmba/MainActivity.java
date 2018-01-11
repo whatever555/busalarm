@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -38,7 +37,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -60,15 +58,15 @@ import java.util.Date;
 import java.util.List;
 
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
-import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
 
 public class MainActivity extends AppCompatActivity {
+    Context mContext = this;
     ArrayAdapter<String> spinnerArrayAdapter;
     int currentInc = 0;
-
+    Button routeBtn1,routeBtn2,routeBtn3;
     String[] stopsList = new String[]{
-            "1", "2","3","45"
+            "1", "2","3","4"
     };
 
     String[] allBusesArray = new String[]{
@@ -240,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openAlarmWindow(JSONObject row) {
-        final Context mContext = this;
         // Parent layout
         int resID = getResources().getIdentifier("main_layout", "id", getPackageName());
         final RelativeLayout parentLayout = ((RelativeLayout) findViewById(resID));
@@ -293,18 +290,35 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
-        // Selection of the spinner
-        final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-        final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-        final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
-
         // Application of the Array to the Spinner
         spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allBusesDisplay);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
-        routeSpinner1.setAdapter(spinnerArrayAdapter);
-        routeSpinner2.setAdapter(spinnerArrayAdapter);
-        routeSpinner3.setAdapter(spinnerArrayAdapter);
+        final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
+                MainActivity.this,
+                spinnerArrayAdapter,
+                "1",
+                R.style.DialogAnimations_SmileWindow,
+                mContext
+        );// With 	Animation
+
+        final RouteSpinnerDialog routeSpinner2 = new RouteSpinnerDialog(
+                MainActivity.this,
+                spinnerArrayAdapter,
+                "1",
+                R.style.DialogAnimations_SmileWindow,
+                mContext
+        );// With 	Animation
+        final RouteSpinnerDialog routeSpinner3 = new RouteSpinnerDialog(
+                MainActivity.this,
+                spinnerArrayAdapter,
+                "1",
+                R.style.DialogAnimations_SmileWindow,
+                mContext
+        );// With 	Animation
+
+
+
 
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
@@ -315,8 +329,37 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view delete button
         Button stopSearchButton = (Button) customView.findViewById(R.id.stop_search_button);
 
+        // Get a reference for the custom view delete button
+        routeBtn1 = (Button) customView.findViewById(R.id.route1_button);
+        // Get a reference for the custom view delete button
+        routeBtn2 = (Button) customView.findViewById(R.id.route2_button);
+        // Get a reference for the custom view delete button
+        routeBtn3 = (Button) customView.findViewById(R.id.route3_button);
+
         //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",mContext);// With No Animation
         searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
+
+        routeSpinner1.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                routeBtn1.setText(item);
+                r1 = item;
+            }
+        });
+        routeSpinner2.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                routeBtn2.setText(item);
+                r2 = item;
+            }
+        });
+        routeSpinner3.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                routeBtn3.setText(item);
+                r3 = item;
+            }
+        });
 
         searchSpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
@@ -331,7 +374,6 @@ public class MainActivity extends AppCompatActivity {
                 searchSpinnerDialog.showSpinerDialog();
             }
         });
-
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -342,49 +384,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        routeSpinner1.setOnItemSelectedListener(new OnItemSelectedListener() {
+        routeBtn1.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (routeSpinner1.isEnabled())
-                    r1 = routeSpinner1.getSelectedItem().toString();
-                System.out.println("CHANGED TO"+r1);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
-        });
-
-
-        routeSpinner2.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (routeSpinner2.isEnabled())
-                    r2 = routeSpinner2.getSelectedItem().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
+            public void onClick(View v) {
+                routeSpinner1.showSpinerDialog();
             }
         });
-
-
-        routeSpinner3.setOnItemSelectedListener(new OnItemSelectedListener() {
+        routeBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (routeSpinner3.isEnabled())
-                    r3 = routeSpinner3.getSelectedItem().toString();
+            public void onClick(View v) {
+                routeSpinner2.showSpinerDialog();
             }
-
+        });
+        routeBtn3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
+            public void onClick(View v) {
+                routeSpinner3.showSpinerDialog();
             }
-
         });
 
         allBusesDisplay.addAll(allBusesDisplay);
@@ -512,11 +528,11 @@ public class MainActivity extends AppCompatActivity {
                 r2 = routes.getString("r2").toLowerCase();
                 r3 = routes.getString("r3").toLowerCase();
                 int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
-                routeSpinner1.setSelection(spinnerPosition);
+                routeBtn1.setText(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(r2);
-                routeSpinner2.setSelection(spinnerPosition);
+                routeBtn2.setText(spinnerPosition);
                 spinnerPosition = spinnerArrayAdapter.getPosition(r3);
-                routeSpinner3.setSelection(spinnerPosition);
+                routeBtn3.setText(spinnerPosition);
 
                 WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
 
@@ -799,11 +815,32 @@ public class MainActivity extends AppCompatActivity {
                     allBusesDisplay.remove("select");
                     allBusesDisplay.add(0, "select");
 
-                    final Spinner routeSpinner1 = (Spinner) customView.findViewById(R.id.bus_routes_list1);
-                    final Spinner routeSpinner2 = (Spinner) customView.findViewById(R.id.bus_routes_list2);
-                    final Spinner routeSpinner3 = (Spinner) customView.findViewById(R.id.bus_routes_list3);
-                    final Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
+                    final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
+                            MainActivity.this,
+                            spinnerArrayAdapter,
+                            "1",
+                            R.style.DialogAnimations_SmileWindow,
+                            mContext
+                    );// With 	Animation
+
+                    final RouteSpinnerDialog routeSpinner2 = new RouteSpinnerDialog(
+                            MainActivity.this,
+                            spinnerArrayAdapter,
+                            "1",
+                            R.style.DialogAnimations_SmileWindow,
+                            mContext
+                    );// With 	Animation
+
+                    final RouteSpinnerDialog routeSpinner3 = new RouteSpinnerDialog(
+                            MainActivity.this,
+                            spinnerArrayAdapter,
+                            "1",
+                            R.style.DialogAnimations_SmileWindow,
+                            mContext
+                    );// With 	Animation
+
+                    final Button saveButton = (Button) customView.findViewById(R.id.save_button);
 
                     routeSpinner1.setEnabled(true);
                     routeSpinner2.setEnabled(true);
@@ -813,11 +850,11 @@ public class MainActivity extends AppCompatActivity {
                     routeSpinner3.setClickable(true);
 
                     int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
-                    routeSpinner1.setSelection(spinnerPosition);
+                    routeBtn1.setText(spinnerPosition);
                     spinnerPosition = spinnerArrayAdapter.getPosition(r2);
-                    routeSpinner2.setSelection(spinnerPosition);
+                    routeBtn2.setText(spinnerPosition);
                     spinnerPosition = spinnerArrayAdapter.getPosition(r3);
-                    routeSpinner3.setSelection(spinnerPosition);
+                    routeBtn3.setText(spinnerPosition);
 
                     saveButton.setEnabled(true);
                     saveButton.setClickable(true);
@@ -828,7 +865,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayAdapter<String> stopAdaptor;
     EditText stopSearchBox;
-    ListView listView;
+    ListView stopListView;
     private class MySpinnerDialog {
         Activity context;
         String dTitle;
@@ -864,18 +901,18 @@ public class MainActivity extends AppCompatActivity {
             TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
             TextView title = (TextView) v.findViewById(R.id.spinerTitle);
             title.setText(dTitle);
-            listView = (ListView) v.findViewById(R.id.list);
+            stopListView = (ListView) v.findViewById(R.id.list);
             stopSearchBox = (EditText) v.findViewById(R.id.searchBox);
 
             stopAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allStopsDisplay);
-            listView.setAdapter(stopAdaptor);
+            stopListView.setAdapter(stopAdaptor);
 
             adb.setView(v);
             alertDialog = adb.create();
             alertDialog.getWindow().getAttributes().windowAnimations = style;//R.style.DialogAnimations_SmileWindow;
             alertDialog.setCancelable(false);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            stopListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     TextView t = (TextView) view.findViewById(R.id.text1);
@@ -935,16 +972,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
     private class StopLister extends AsyncTask<String, Integer, String> {
@@ -1075,14 +1102,115 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    listView.setAdapter(stopAdaptor);
+                    stopListView.setAdapter(stopAdaptor);
 
-                    listView.requestLayout();
+                    stopListView.requestLayout();
                     //stopAdaptor.getFilter().filter(stopSearchBox.getText().toString());
                     v.requestLayout();
                 }
             }
         }
+    }
+
+    
+    private class RouteSpinnerDialog {
+        Activity context;
+        String dTitle;
+        OnSpinerItemClick onSpinerItemClick;
+        AlertDialog alertDialog;
+        int pos;
+        int style;
+        Context mContext;
+        ArrayAdapter<String> spinnerArrayAdaptor;
+
+        public RouteSpinnerDialog(Activity activity, ArrayAdapter<String> spinnerArrayAdaptor, String dialogTitle, Context mContext) {
+            this.context = activity;
+            this.spinnerArrayAdaptor = spinnerArrayAdaptor;
+            this.dTitle = dialogTitle;
+            this.mContext = mContext;
+        }
+
+        public RouteSpinnerDialog(Activity activity, ArrayAdapter<String> spinnerArrayAdaptor, String dialogTitle, int style, Context mContext) {
+            this.context = activity;
+            this.spinnerArrayAdaptor = spinnerArrayAdaptor;
+            this.dTitle = dialogTitle;
+            this.style = style;
+            this.mContext = mContext;
+        }
+
+        public void setEnabled(boolean b){
+
+        }
+
+        public void setClickable(boolean b){
+
+        }
+
+        public boolean isEnabled(){
+            return true;
+        }
+
+        public void bindOnSpinerListener(OnSpinerItemClick onSpinerItemClick1) {
+            this.onSpinerItemClick = onSpinerItemClick1;
+        }
+
+        public void showSpinerDialog() {
+            AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            final View v = context.getLayoutInflater().inflate(R.layout.dialog_layout, null);
+            TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
+            TextView title = (TextView) v.findViewById(R.id.spinerTitle);
+            title.setText(dTitle);
+            final ListView listView = (ListView) v.findViewById(R.id.list);
+            final EditText searchBox = (EditText) v.findViewById(R.id.searchBox);
+
+            listView.setAdapter(spinnerArrayAdaptor);
+
+            adb.setView(v);
+            alertDialog = adb.create();
+            alertDialog.getWindow().getAttributes().windowAnimations = style;//R.style.DialogAnimations_SmileWindow;
+            alertDialog.setCancelable(false);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    TextView t = (TextView) view.findViewById(R.id.text1);
+                    for (int j = 0; j < allBusesDisplay.size(); j++) {
+                        if (t.getText().toString().equalsIgnoreCase(allBusesDisplay.get(j).toString())) {
+                            pos = j;
+                        }
+                    }
+                    onSpinerItemClick.onClick(t.getText().toString(), pos);
+                    alertDialog.dismiss();
+                }
+            });
+
+            searchBox.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    System.out.println("ROUTE TEXT CHANGED");
+                    spinnerArrayAdapter.getFilter().filter(searchBox.getText().toString());
+                }
+            });
+
+            rippleViewClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.show();
+        }
+
     }
 
 }
