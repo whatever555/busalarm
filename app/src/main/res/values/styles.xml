@@ -19,7 +19,25 @@
 
     <style name="DialogAnimations" />
 
+    <!-- TABLES -->
+    <style name="basicTableLayout">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:shrinkColumns">*</item>
+        <item name="android:stretchColumns">*</item>
+    </style>
 
+    <style name="basicTableLayoutContent" parent="basicTableLayout">
+        <item name="android:paddingBottom">46dp</item>
+    </style>
+
+    <style name="basicTableLayoutHeading" parent="basicTableLayout">
+        <item name="android:background">#eeeefe</item>
+
+    </style>
+
+    <!-- HEADINGS -->
     <style name="headerText">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">@dimen/buttonHeight</item>
