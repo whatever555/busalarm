@@ -1,5 +1,7 @@
 package com.alarm.emurph.alarmba;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,6 +30,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -35,6 +38,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -49,14 +53,24 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
+import in.galaxyofandroid.spinerdialog.SpinnerDialog;
+
+
 public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> spinnerArrayAdapter;
     int currentInc = 0;
+
+    String[] stopsList = new String[]{
+            "1", "2","3","45"
+    };
+
     String[] allBusesArray = new String[]{
             "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
             "15","15a","15b","15d","16","16c","17","17a","18","25",
@@ -73,9 +87,14 @@ public class MainActivity extends AppCompatActivity {
     };
     String stopVal = "0";
     String r1,r2,r3 = "select";
+    MySpinnerDialog searchSpinnerDialog;
 
     ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
     ArrayList<String> allBusesDisplay = new ArrayList<String>(allBuses);
+
+    ArrayList<String> allStops = new ArrayList<>(Arrays.asList(stopsList));
+    ArrayList<String> allStopsDisplay = new ArrayList<String>(allStops);
+
     AlarmData alarmData;
     String jsonString;
 
@@ -293,8 +312,28 @@ public class MainActivity extends AppCompatActivity {
         final Button saveButton = (Button) customView.findViewById(R.id.save_button);
         // Get a reference for the custom view delete button
         Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
-        // Get a reference for the custom view nearby button
-        final Button nearbyButton = (Button) customView.findViewById(R.id.nearby_button);
+        // Get a reference for the custom view delete button
+        Button stopSearchButton = (Button) customView.findViewById(R.id.stop_search_button);
+
+        //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",mContext);// With No Animation
+        searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
+
+        searchSpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                Toast.makeText(MainActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
+
+                String[] stopData=item.split(":");
+
+                stopNumberText.setText(stopData[0]);
+            }
+        });
+        stopSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSpinnerDialog.showSpinerDialog();
+            }
+        });
 
         // Set a click listener for the popup window close button
         closeButton.setOnClickListener(new View.OnClickListener() {
@@ -789,4 +828,264 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    ArrayAdapter<String> stopAdaptor;
+    EditText stopSearchBox;
+    ListView listView;
+    private class MySpinnerDialog {
+        Activity context;
+        String dTitle;
+        OnSpinerItemClick onSpinerItemClick;
+        AlertDialog alertDialog;
+        int pos;
+        int style;
+        Context mContext;
+
+
+        public MySpinnerDialog(Activity activity, ArrayList<String> items, String dialogTitle, Context mContext) {
+
+            this.context = activity;
+            this.dTitle = dialogTitle;
+            this.mContext = mContext;
+        }
+
+        public MySpinnerDialog(Activity activity, ArrayList<String> items, String dialogTitle, int style, Context mContext) {
+
+            this.context = activity;
+            this.dTitle = dialogTitle;
+            this.style = style;
+            this.mContext = mContext;
+        }
+
+        public void bindOnSpinerListener(OnSpinerItemClick onSpinerItemClick1) {
+            this.onSpinerItemClick = onSpinerItemClick1;
+        }
+
+        public void showSpinerDialog() {
+            AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            final View v = context.getLayoutInflater().inflate(R.layout.dialog_layout, null);
+            TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
+            TextView title = (TextView) v.findViewById(R.id.spinerTitle);
+            title.setText(dTitle);
+            listView = (ListView) v.findViewById(R.id.list);
+            stopSearchBox = (EditText) v.findViewById(R.id.searchBox);
+
+            stopAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allStopsDisplay);
+            listView.setAdapter(stopAdaptor);
+
+            adb.setView(v);
+            alertDialog = adb.create();
+            alertDialog.getWindow().getAttributes().windowAnimations = style;//R.style.DialogAnimations_SmileWindow;
+            alertDialog.setCancelable(false);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    TextView t = (TextView) view.findViewById(R.id.text1);
+                    for (int j = 0; j < allStopsDisplay.size(); j++) {
+                        if (t.getText().toString().equalsIgnoreCase(allStopsDisplay.get(j).toString())) {
+                            pos = j;
+                        }
+                    }
+                    onSpinerItemClick.onClick(t.getText().toString(), pos);
+                    alertDialog.dismiss();
+                }
+            });
+
+            stopSearchBox.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    System.out.println("TEXT CHANGED");
+
+                    allStopsDisplay.removeAll(allStopsDisplay);
+
+                    currentInc++;
+                    final int snapInc = currentInc;
+                    try {
+                        StopLister RL = new StopLister(
+                                mContext,
+                                stopSearchBox.getText().toString(),
+                                snapInc,
+                                v
+                        );
+                        RL.execute();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //stopAdaptor.getFilter().filter(stopSearchBox.getText().toString());
+                }
+            });
+
+            rippleViewClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.show();
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    private class StopLister extends AsyncTask<String, Integer, String> {
+
+        // static String FILENAME = "test.txt";
+        HttpURLConnection conn;
+        URL url;
+        String searchText;
+        Context context;
+        int READ_TIMEOUT = 2200;
+        int CONNECTION_TIMEOUT = 2200;
+        String stopList = "";
+        int snapInc=0;
+        View v;
+
+        public StopLister(
+                Context context,
+                String searchText,
+                int snapInc,
+                View v) {
+            super();
+            this.v=v;
+            this.snapInc=snapInc;
+            this.context = context;
+            this.searchText = searchText;
+        }
+
+        @Override
+        protected String doInBackground(String... str) {
+
+            if (snapInc == currentInc) {
+                try {
+                    // Enter URL address where your php file resides
+                    url = new URL("https://tippit.eu/find?s=" + URLEncoder.encode(searchText, "UTF-8"));
+                    System.out.println("https://tippit.eu/find?s=" +  URLEncoder.encode(searchText, "UTF-8"));
+
+                    //url = new URL("https://imaga.me/test.php");
+                } catch (Exception e) {
+
+                    // TODO Auto-generated catch block
+                    // e.printStackTrace();
+
+                    return e.toString();
+                }
+                try {
+
+                    // Setup HttpURLConnection class to send and receive data from php
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(READ_TIMEOUT);
+                    conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                    conn.setRequestMethod("GET");
+
+                    // setDoOutput to true as we recieve data from json file
+                    conn.setDoOutput(false);
+
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+
+                    return "";
+                }
+
+                try {
+                    int response_code = conn.getResponseCode();
+
+                    // Check if successful connection made
+                    if (response_code == HttpURLConnection.HTTP_OK) {
+                        try {
+                            // Read data sent from server
+                            InputStream input = conn.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                            StringBuilder result = new StringBuilder();
+                            String line;
+
+                            while ((line = reader.readLine()) != null) {
+                                result.append(line);
+                            }
+
+                            stopList = result.toString();
+
+                            // Pass data to onPostExecute method
+                            return (result.toString());
+                        } catch (Exception e) {
+                            return ("unsuccessful");
+                        }
+                    } else {
+
+                        return ("unsuccessful");
+                    }
+
+                } catch (Exception e) {
+                    //sendNotification(context, "ERROR 4" +  e.getClass().getSimpleName());
+                    //e.printStackTrace();
+
+                    return "";
+                } finally {
+                    //  setAlarms(context, 0);
+                    conn.disconnect();
+                }
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (snapInc == currentInc) {
+                try {
+                    super.onPostExecute(s);
+                    if (stopList != null)
+                        if (stopList.length() > 1) {
+                            System.out.println("STOPLOST: "+stopList);
+
+                            allStopsDisplay.removeAll(allStopsDisplay);
+
+                            JSONArray ja = new JSONArray(stopList);
+                            if (ja != null) {
+                                for (int i = 0; i < ja.length(); i++) {
+                                    JSONObject jo = ja.getJSONObject(i);
+                                    String listText= jo.getString("id");
+                                    listText += ": "+jo.getString("name");
+                                    System.out.println(listText);
+                                    allStopsDisplay.add(listText);
+                                }
+                            }
+
+                        }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    listView.setAdapter(stopAdaptor);
+
+                    listView.requestLayout();
+                    //stopAdaptor.getFilter().filter(stopSearchBox.getText().toString());
+                    v.requestLayout();
+                }
+            }
+        }
+    }
+
 }
