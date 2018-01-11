@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     int currentInc = 0;
     Button routeBtn1,routeBtn2,routeBtn3;
     String[] stopsList = new String[]{
-            "1", "2","3","4"
+
     };
 
     String[] allBusesArray = new String[]{
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             "75","76","76a","77a","77x","79","79a","83","83a","84","84a","84x",
             "102","104","111","114","116","118","120","122","123","130","140",
             "142","145","150","151","161","184","185","220","236","238","239",
-            "270","747","757"
+            "270","747","757", "red", "green"
     };
     String stopVal = "0";
     String r1,r2,r3 = "select";
@@ -105,11 +105,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        for(int i =1; i<=71; i++) {
-            allBusesDisplay.add("LUAS" + i);
-            allBuses.add("LUAS" + i);
-        }
         alarmData = new AlarmData();
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
@@ -333,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view delete button
         routeBtn3 = (Button) customView.findViewById(R.id.route3_button);
 
-        //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",mContext);// With No Animation
+        //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",mContext);// With No Animation
         searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Select bus stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
 
         routeSpinner1.bindOnSpinerListener(new OnSpinerItemClick() {
