@@ -280,7 +280,6 @@ public class MainActivity extends AppCompatActivity {
         notificationPrelay.setFilters(new InputFilter[]{new InputFilterMinMax("1", "59")});
         duration.setFilters(new InputFilter[]{new InputFilterMinMax("1", "45")});
 
-
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
             @Override
             public String format(int i) {
@@ -297,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
                 MainActivity.this,
                 spinnerArrayAdapter,
-                "1",
+                "Select route:",
                 R.style.DialogAnimations_SmileWindow,
                 mContext
         );// With 	Animation
@@ -305,14 +304,14 @@ public class MainActivity extends AppCompatActivity {
         final RouteSpinnerDialog routeSpinner2 = new RouteSpinnerDialog(
                 MainActivity.this,
                 spinnerArrayAdapter,
-                "1",
+                "Select route:",
                 R.style.DialogAnimations_SmileWindow,
                 mContext
         );// With 	Animation
         final RouteSpinnerDialog routeSpinner3 = new RouteSpinnerDialog(
                 MainActivity.this,
                 spinnerArrayAdapter,
-                "1",
+                "Select route:",
                 R.style.DialogAnimations_SmileWindow,
                 mContext
         );// With 	Animation
@@ -527,12 +526,10 @@ public class MainActivity extends AppCompatActivity {
                 r1 = routes.getString("r1").toLowerCase();
                 r2 = routes.getString("r2").toLowerCase();
                 r3 = routes.getString("r3").toLowerCase();
-                int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
-                routeBtn1.setText(spinnerPosition);
-                spinnerPosition = spinnerArrayAdapter.getPosition(r2);
-                routeBtn2.setText(spinnerPosition);
-                spinnerPosition = spinnerArrayAdapter.getPosition(r3);
-                routeBtn3.setText(spinnerPosition);
+
+                routeBtn1.setText(r1);
+                routeBtn2.setText(r2);
+                routeBtn3.setText(r3);
 
                 WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
 
@@ -849,13 +846,6 @@ public class MainActivity extends AppCompatActivity {
                     routeSpinner2.setClickable(true);
                     routeSpinner3.setClickable(true);
 
-                    int spinnerPosition = spinnerArrayAdapter.getPosition(r1);
-                    routeBtn1.setText(spinnerPosition);
-                    spinnerPosition = spinnerArrayAdapter.getPosition(r2);
-                    routeBtn2.setText(spinnerPosition);
-                    spinnerPosition = spinnerArrayAdapter.getPosition(r3);
-                    routeBtn3.setText(spinnerPosition);
-
                     saveButton.setEnabled(true);
                     saveButton.setClickable(true);
                 }
@@ -1160,9 +1150,10 @@ public class MainActivity extends AppCompatActivity {
             TextView rippleViewClose = (TextView) v.findViewById(R.id.close);
             TextView title = (TextView) v.findViewById(R.id.spinerTitle);
             title.setText(dTitle);
-            final ListView listView = (ListView) v.findViewById(R.id.list);
+            ListView listView = (ListView) v.findViewById(R.id.list);
             final EditText searchBox = (EditText) v.findViewById(R.id.searchBox);
 
+            spinnerArrayAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allBusesDisplay);
             listView.setAdapter(spinnerArrayAdaptor);
 
             adb.setView(v);
