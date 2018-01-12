@@ -44,6 +44,11 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +69,7 @@ import java.util.List;
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback {
     Context mContext = this;
     int currentInc = 0;
     Button routeBtn1,routeBtn2,routeBtn3;
@@ -102,14 +107,20 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray;
     private CountDownTimer timer;
 
+    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
+    static final LatLng KIEL = new LatLng(53.551, 9.993);
+    private SupportMapFragment mapFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         alarmData = new AlarmData();
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
 
         setContentView(R.layout.activity_main);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +148,14 @@ public class MainActivity extends AppCompatActivity {
 
         loadApp();
     }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(0, 0))
+                .title("Marker"));
+    }
+
 
     public void loadApp(){
 
@@ -547,6 +566,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
+
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     public void reloadApp(){
@@ -1205,4 +1229,5 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
 }
