@@ -19,15 +19,22 @@
 
     <style name="DialogAnimations" />
 
+    <style name="basic">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <!-- SCROLL BARS -->
     <style name="mainScroll">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:fillViewport">true</item>
         <item name="android:background">#f3f3FE</item>
-        <item name="android:padding">12dp</item>
         <item name="android:paddingBottom">0dp</item>
         <item name="android:layout_below">@id/top_sticky_label</item>
+    </style>
+    <style name="paddedContent" parent="basic">
+        <item name="android:padding">12dp</item>
     </style>
 
     <style name="basicDivider" parent="basicDivider">
