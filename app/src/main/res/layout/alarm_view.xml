@@ -124,11 +124,9 @@
                 </TableRow>
                 <TableRow>
                     <TextView
-                        style="@style/basicText"
-                        android:layout_span="12"
-                        android:layout_gravity="center"
+                        style="@style/sub_h1"
                         android:text="(Leave blank for all routes)"
-                        android:textSize="12sp" />
+                        />
                 </TableRow>
 
             </TableLayout>
