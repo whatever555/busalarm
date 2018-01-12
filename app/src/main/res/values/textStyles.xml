@@ -1,0 +1,17 @@
+<resources>
+    <!-- TEXT -->
+    <style name="basicText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#777779</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="editText" parent="basicText">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">7dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+</resources>

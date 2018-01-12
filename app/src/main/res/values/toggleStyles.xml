@@ -1,0 +1,6 @@
+<resources>
+    <!--TOGGLES -->
+    <style name="basicToggle" parent="basicButton">
+        <item name="android:background">@drawable/ic_toggle</item>
+    </style>
+</resources>

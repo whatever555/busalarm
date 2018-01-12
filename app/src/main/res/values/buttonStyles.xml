@@ -1,0 +1,23 @@
+<resources>
+    <!-- BUTTONS -->
+    <style name="basicButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/ic_button</item>
+        <item name="android:typeface">monospace</item>
+    </style>
+
+    <style name="saveButton" parent="basicButton">
+        <item name="android:background">#4a4</item>
+    </style>
+
+    <style name="deleteButton" parent="basicButton">
+        <item name="android:background">#a44</item>
+    </style>
+
+    <style name="cancelButton" parent="basicButton">
+        <item name="android:background">#aaf</item>
+    </style>
+</resources>

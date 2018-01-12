@@ -1,0 +1,22 @@
+<resources>
+    <!-- HEADINGS -->
+    <style name="headerText" parent="basicText">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="h1" parent="@style/headerText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_span">12</item>
+    </style>
+
+    <style name="h1_sticky" parent="@style/h1">
+        <item name="android:textColor">#EEF</item>
+        <item name="android:color">#EEF</item>
+    </style>
+
+    <style name="h2" parent="headerText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_span">12</item>
+    </style>
+</resources>

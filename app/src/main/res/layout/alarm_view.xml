@@ -10,7 +10,7 @@
         <TableRow>
             <TextView
                 style="@style/h1_sticky"
-                android:text="Schedule notification" />
+                android:text="Schedule notifications" />
         </TableRow>
     </TableLayout>
 
@@ -198,7 +198,7 @@
 
                     <ToggleButton
                         android:id="@+id/ampm"
-                        style="@style/basicToggle"
+                        style="@style/basicButton"
                         android:layout_span="4"
                         android:height="25dp"
                         android:textOff="AM"
@@ -239,18 +239,17 @@
             </TableLayout>
 
             <TableLayout style="@style/basicTableLayoutHeading">
-
                 <TableRow>
 
                     <TextView
                         style="@style/h1"
                         android:text="Repeat:" />
                 </TableRow>
-
             </TableLayout>
             <View style="@style/basicDivider"></View>
 
-            <TableLayout style="@style/basicTableLayoutContent">
+            <TableLayout
+                style="@style/repeatButtonHolder">
 
                 <TableRow
                     android:layout_width="fill_parent"
