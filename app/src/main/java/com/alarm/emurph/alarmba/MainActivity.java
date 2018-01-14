@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -291,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText stopNumberText = (EditText) customView.findViewById(R.id.stop_number);
 
-
         final RouteSpinnerDialog routeSpinner1 = new RouteSpinnerDialog(
                 MainActivity.this,
                 "Select route:",
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
         // Get a reference for the custom view delete button
         Button deleteButton = (Button) customView.findViewById(R.id.delete_button);
         // Get a reference for the custom view delete button
-        Button stopSearchButton = (Button) customView.findViewById(R.id.stop_search_button);
+        final Button stopSearchButton = (Button) customView.findViewById(R.id.stop_search_button);
 
         // Get a reference for the custom view delete button
         routeBtn1 = (Button) customView.findViewById(R.id.route1_button);
@@ -331,6 +331,12 @@ public class MainActivity extends AppCompatActivity {
         //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",mContext);// With No Animation
         searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
 
+
+        if (!isNetworkAvailable()){
+            stopSearchButton.setVisibility(View.GONE);
+        }else{
+            stopNumberText.setVisibility(View.GONE);
+        }
         routeSpinner1.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String item, int position) {
@@ -358,18 +364,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(String item, int position) {
                 String[] stopData=item.split(":");
                 stopNumberText.setText(stopData[0]);
+                stopSearchButton.setText(stopData[0]);
             }
         });
         stopSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isNetworkAvailable()){
-                    searchSpinnerDialog.showSpinerDialog();
-                }
-                else {
-                    Toast.makeText(mContext, "Requires internet connection \nPlease enter manually",
-                            Toast.LENGTH_SHORT).show();
-                }
+                searchSpinnerDialog.showSpinerDialog();
+                stopSearchBox.setText(stopNumberText.getText().toString());
+                InputMethodManager keyboard = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                keyboard.showSoftInput(customView, 0);
             }
         });
         // Set a click listener for the popup window close button
@@ -519,7 +524,7 @@ public class MainActivity extends AppCompatActivity {
                 duration.setText(row.getString("duration"));
                 notificationPrelay.setText(row.getString("notification_prelay"));
                 stopNumberText.setText(row.getString("stop_number"));
-
+                stopSearchButton.setText(row.getString("stop_number"));
                 JSONObject routes = row.getJSONObject("routes");
 
                 r1 = routes.getString("r1").toLowerCase();
@@ -546,6 +551,10 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getMessage());
         }
     }
+    else
+        {
+            stopNumberText.setText("");
+        }
         mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
     }
 
@@ -589,9 +598,15 @@ public class MainActivity extends AppCompatActivity {
               //  alarmData.deleteAlarm(this, alarmId);
             }
 
+            String title = name.getText().toString();
+            if(name.length() == 0)
+            {
+                title = "Notifications for stop: "+stopNumberText.getText();
+            }
+
             jsonObject.put("alarm_id", Integer.toString(alarmId));
             jsonObject.put("active", name.getTag());
-            jsonObject.put("name", name.getText());
+            jsonObject.put("name", title);
             jsonObject.put("routes", routes);
             jsonObject.put("hrs", hrsNumPick.getValue());
             jsonObject.put("mins", minsNumPick.getValue());
@@ -886,6 +901,7 @@ public class MainActivity extends AppCompatActivity {
             title.setText(dTitle);
             stopListView = (ListView) v.findViewById(R.id.list);
             stopSearchBox = (EditText) v.findViewById(R.id.searchBox);
+            stopSearchBox.setHint("Search for route name/id");
 
             stopAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allStopsDisplay);
             stopListView.setAdapter(stopAdaptor);
