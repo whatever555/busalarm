@@ -901,7 +901,7 @@ public class MainActivity extends AppCompatActivity {
             title.setText(dTitle);
             stopListView = (ListView) v.findViewById(R.id.list);
             stopSearchBox = (EditText) v.findViewById(R.id.searchBox);
-            stopSearchBox.setHint("Search for route name/id");
+            stopSearchBox.setHint("Search for STOP name/id");
 
             stopAdaptor = new ArrayAdapter<String>(context, R.layout.items_view, allStopsDisplay);
             stopListView.setAdapter(stopAdaptor);
