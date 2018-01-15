@@ -288,13 +288,16 @@ public class Alarm extends BroadcastReceiver {
 
                             String busRoute = row.getString("route");
                             try {
-                                int duetime = Integer.parseInt(row.getString("duetime"));
+                                String dt = row.getString("duetime");
+                                if (!dt.equals("Due")) {
+                                    int duetime = Integer.parseInt(dt);
 
-                                int notificationPrelay = Integer.parseInt(currentAlarmData.getString("notification_prelay"));
+                                    int notificationPrelay = Integer.parseInt(currentAlarmData.getString("notification_prelay"));
 
-                                if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
-                                    if (duetime == notificationPrelay || duetime == notificationPrelay-1) {
-                                        sendNotification(context, busRoute + " arriving to stop " + stopNumber + " in " + notificationPrelay + " mins");
+                                    if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
+                                        if (duetime == notificationPrelay || duetime == notificationPrelay - 1) {
+                                            sendNotification(context, busRoute + " arriving to stop " + stopNumber + " in " + notificationPrelay + " mins");
+                                        }
                                     }
                                 }
                             }catch(Exception e){}

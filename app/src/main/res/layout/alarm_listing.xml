@@ -36,6 +36,10 @@
 
         </TableRow>
     </TableLayout>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:id="@+id/live_data"
+        android:layout_height="wrap_content"></TableLayout>
     <View style="@style/basicDivider"></View>
 
 </LinearLayout>

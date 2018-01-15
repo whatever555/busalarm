@@ -25,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -39,9 +38,9 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             "270","747","757", "red", "green"
     };
     String stopVal = "0";
-    String r1,r2,r3 = "select";
+    String r1 = "select",r2="select",r3 = "select";
     MySpinnerDialog searchSpinnerDialog;
 
     ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
@@ -198,7 +197,12 @@ public class MainActivity extends AppCompatActivity {
 
                 if (alarmData.isActive(row))
                 {
-                    alarmView.setBackgroundColor(Color.RED);
+                    alarmView.setBackgroundColor(Color.GREEN);
+
+                    final TableLayout tl = (TableLayout)view.findViewById(R.id.live_data);
+                    // String jsonBusString = getStopInfo(stopNumber);
+                    AsyncLoader RF = new AsyncLoader(mContext, row.getString("stop_number"), row, tl);
+                    RF.execute();
                 }
 
                 editAlarmTR.setOnClickListener(new View.OnClickListener() {
@@ -1009,7 +1013,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // Enter URL address where your php file resides
                     url = new URL("https://tippit.eu/find?s=" + URLEncoder.encode(searchText, "UTF-8"));
-                    System.out.println("https://tippit.eu/find?s=" +  URLEncoder.encode(searchText, "UTF-8"));
 
                     //url = new URL("https://imaga.me/test.php");
                 } catch (Exception e) {
@@ -1220,5 +1223,150 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+
+
+    private class AsyncLoader extends AsyncTask<String, Integer, String> {
+
+        // static String FILENAME = "test.txt";
+        HttpURLConnection conn;
+        URL url;
+        String stopNumber;
+        Context context;
+        int READ_TIMEOUT = 2200;
+        int CONNECTION_TIMEOUT = 2200;
+        String jsonBusString;
+        JSONObject currentAlarmData;
+        TableLayout tl;
+
+        public AsyncLoader(Context context, String stopNumber, JSONObject currentAlarmData, TableLayout tl) {
+            super();
+            this.tl=tl;
+            this.currentAlarmData=currentAlarmData;
+            this.context = context;
+            this.stopNumber = stopNumber;
+
+        }
+
+        @Override
+        protected String doInBackground(String... str) {
+            try {
+                // Enter URL address where your php file resides
+                url = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopNumber + "&format=json");
+                //url = new URL("https://imaga.me/test.php");
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+                return e.toString();
+            }
+            try {
+
+                // Setup HttpURLConnection class to send and receive data from php
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("GET");
+
+                // setDoOutput to true as we recieve data from json file
+                conn.setDoOutput(false);
+
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+
+                return "";
+            }
+
+            try {
+                int response_code = conn.getResponseCode();
+
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    try {
+                        // Read data sent from server
+                        InputStream input = conn.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                        StringBuilder result = new StringBuilder();
+                        String line;
+
+                        while ((line = reader.readLine()) != null) {
+                            result.append(line);
+                        }
+
+                        jsonBusString = result.toString();
+                        // Pass data to onPostExecute method
+                        return (result.toString());
+                    }
+                    catch(Exception e) {
+
+                        return ("unsuccessful");
+                    }
+
+                } else {
+
+                    return ("unsuccessful");
+                }
+
+            }catch(Exception e){
+                //sendNotification(context, "ERROR 4" +  e.getClass().getSimpleName());
+                //e.printStackTrace();
+
+                return "";
+            } finally {
+                //  setAlarms(context, 0);
+                conn.disconnect();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            try{
+                super.onPostExecute(s);
+
+                if (jsonBusString != null)
+                    if (jsonBusString.length() > 1) {
+                        try {
+                            JSONObject routes = this.currentAlarmData.getJSONObject("routes");
+                            System.out.println(routes);
+
+                            String route1 = routes.getString("r1");
+                            String route2 = routes.getString("r2");
+                            String route3 = routes.getString("r3");
+
+                            try {
+                                JSONObject busArray = new JSONObject(jsonBusString);
+                                JSONArray stopDataArray = busArray.getJSONArray("results");
+                                boolean allRoutes = route1.equals(route2) && route2.equals(route3) && (route3.equals("select") || (route3.equals("----------")));
+
+                                if (stopDataArray != null)
+                                    for (int i = 0; i < stopDataArray.length(); i++) {
+                                        final JSONObject row = stopDataArray.getJSONObject(i);
+
+                                        String busRoute = row.getString("route");
+                                        try {
+                                            String duetime = row.getString("duetime");
+
+                                            if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
+
+                                                    TableRow tr = new TableRow(context);
+                                                    TextView tv = new TextView(context);
+                                                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                                                    tv.setText(busRoute + " arriving to stop " + stopNumber + " in " + duetime + " mins");
+                                                    tr.addView(tv);
+                                                    tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                                                    tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                                            }
+                                        }catch(Exception e){e.printStackTrace();}
+                                    }
+                            }catch(Exception e){e.printStackTrace();}
+                            //content.setText(sb.toString());
+                        }catch(Exception e){e.printStackTrace();}
+                    }
+            }catch(Exception e){e.printStackTrace();}
+        }
     }
 }
