@@ -197,9 +197,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (alarmData.isActive(row))
                 {
-                    alarmView.setBackgroundColor(Color.GREEN);
 
-                    final TableLayout tl = (TableLayout)view.findViewById(R.id.live_data);
+                    final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
+                    mainRow.setBackgroundColor(Color.GREEN);
+
+                    final TableLayout tl = (TableLayout)alarmView.findViewById(R.id.live_data);
                     // String jsonBusString = getStopInfo(stopNumber);
                     AsyncLoader RF = new AsyncLoader(mContext, row.getString("stop_number"), row, tl);
                     RF.execute();
@@ -1358,7 +1360,7 @@ public class MainActivity extends AppCompatActivity {
                                                     tv.setText(busRoute + " arriving to stop " + stopNumber + " in " + duetime + " mins");
                                                     tr.addView(tv);
                                                     tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                                                    tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                                                    tl.addView(tr);
                                             }
                                         }catch(Exception e){e.printStackTrace();}
                                     }
