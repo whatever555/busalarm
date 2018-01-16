@@ -314,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
 
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
-        hrsNumPick.setMinValue(0);
-        hrsNumPick.setMaxValue(11);
+        hrsNumPick.setMinValue(1);
+        hrsNumPick.setMaxValue(12);
         hrsNumPick.setValue(currentHour);
         minsNumPick.setValue(currentMins);
 
