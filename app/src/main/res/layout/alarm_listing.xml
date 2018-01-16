@@ -1,45 +1,53 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/alarmView"
-    android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    style="@style/basicToggle"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/alarmView"
     android:padding="12dp">
-    <TableLayout
-        android:layout_width="match_parent"
+
+    <LinearLayout
+        style="@style/basicToggle"
+        android:padding="3dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/secondaryColor"
-        android:padding="12dp"
-        android:layout_below="@id/alarmView"
-        android:shrinkColumns="*"  android:stretchColumns="*">
+        android:orientation="vertical">
 
-        <!-- Row 2 with 12 columns -->
-        <TableRow
-            android:id="@+id/editAlarmTR">
+        <TableLayout
+            android:id="@+id/editAlarmHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/alarmView"
+            android:background="@color/secondaryColor"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:shrinkColumns="*"
+            android:stretchColumns="*">
 
-            <TextView
-                android:id="@+id/editAlarm"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_span="10"
-                android:color="#333335"
-                android:textSize="16dp"
-                tools:text="Edit"/>
-            <Switch
-                android:id="@+id/active_toggle"
-                android:layout_width="wrap_content"
-                android:layout_span="2"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
+            <!-- Row 2 with 12 columns -->
+            <TableRow android:id="@+id/editAlarmTR">
 
-        </TableRow>
-    </TableLayout>
-    <TableLayout
-        android:layout_width="match_parent"
-        android:id="@+id/live_data"
-        android:layout_height="wrap_content"></TableLayout>
-    <View style="@style/basicDivider"></View>
+                <TextView
+                    android:id="@+id/editAlarm"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_span="10"
+                    android:color="#333335"
+                    android:textSize="16dp"
+                    tools:text="" />
 
+                <Switch
+                    android:id="@+id/active_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="2"
+                    android:checked="true" />
+
+            </TableRow>
+        </TableLayout>
+
+        <View style="@style/basicDivider"></View>
+
+    </LinearLayout>
 </LinearLayout>

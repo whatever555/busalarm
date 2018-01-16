@@ -36,6 +36,7 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableLayout;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        timer = new CountDownTimer(20000, 20) {
+        timer = new CountDownTimer(20000, 12) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -138,19 +139,28 @@ public class MainActivity extends AppCompatActivity {
         loadApp();
     }
 
+    TableLayout liveDataTl;
+    ScrollView liveDataHolder;
     public void loadApp(){
 
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
+        TableLayout liveData = (TableLayout) findViewById(R.id.live_data); alarmListHolder.removeAllViews();
 
         jsonString = alarmData.readFromFile(this);
 
         View view;
+        View busListView;
         // Layout inflater
         LayoutInflater layoutInflater;
         jsonArray = new JSONArray();
 
         try {
             jsonArray = new JSONArray(jsonString);
+            liveDataHolder = (ScrollView) findViewById(R.id.live_data_holder);
+            liveDataHolder.setVisibility(View.GONE);
+            liveDataTl = (TableLayout) findViewById(R.id.live_data);
+            layoutInflater = getLayoutInflater();
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 // Parent layout
                 final RelativeLayout parentLayout = new RelativeLayout(this);
@@ -159,8 +169,6 @@ public class MainActivity extends AppCompatActivity {
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
                 parentLayout.setLayoutParams(rlp);
                 alarmListHolder.addView(parentLayout);
-
-                layoutInflater = getLayoutInflater();
 
                 final JSONObject row = jsonArray.getJSONObject(i);
 
@@ -197,13 +205,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if (alarmData.isActive(row))
                 {
-
                     final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
-                    mainRow.setBackgroundColor(Color.GREEN);
+                    final TableLayout Ah = (TableLayout)alarmView.findViewById(R.id.editAlarmHolder);
+                    //mainRow.setBackgroundColor(Color.GREEN);
+                    mainRow.setBackgroundColor(Color.parseColor("#e9e9EE"));
+                    Ah.setBackgroundColor(Color.parseColor("#e9e9EE"));
 
-                    final TableLayout tl = (TableLayout)alarmView.findViewById(R.id.live_data);
                     // String jsonBusString = getStopInfo(stopNumber);
-                    AsyncLoader RF = new AsyncLoader(mContext, row.getString("stop_number"), row, tl);
+                    AsyncLoader RF = new AsyncLoader(mContext, row.getString("stop_number"), row);
                     RF.execute();
                 }
 
@@ -1241,11 +1250,9 @@ public class MainActivity extends AppCompatActivity {
         int CONNECTION_TIMEOUT = 2200;
         String jsonBusString;
         JSONObject currentAlarmData;
-        TableLayout tl;
 
-        public AsyncLoader(Context context, String stopNumber, JSONObject currentAlarmData, TableLayout tl) {
+        public AsyncLoader(Context context, String stopNumber, JSONObject currentAlarmData) {
             super();
-            this.tl=tl;
             this.currentAlarmData=currentAlarmData;
             this.context = context;
             this.stopNumber = stopNumber;
@@ -1353,15 +1360,24 @@ public class MainActivity extends AppCompatActivity {
                                             String duetime = row.getString("duetime");
 
                                             if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
-
                                                     TableRow tr = new TableRow(context);
-                                                    TextView tv = new TextView(context);
-                                                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                                                    tv.setText(busRoute + " arriving to stop " + stopNumber + " in " + duetime + " mins");
-                                                    tr.addView(tv);
-                                                    tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                                                    tl.addView(tr);
+
+                                                // tv.setText(paddedBusRoute + ""+ paddedStopNumber + ""+  duetime + " mins");
+                                                RealTimeDisplay rt = new RealTimeDisplay(
+                                                        context,
+                                                        busRoute,
+                                                        stopNumber,
+                                                        duetime + " mins",
+                                                        row.getString("destination")
+                                                );
+
+                                                rt.addToMe(tr);
+                                                liveDataTl.addView(tr);
+                                                liveDataHolder.setVisibility(View.VISIBLE);
+
+                                                System.out.println("setting");
                                             }
+
                                         }catch(Exception e){e.printStackTrace();}
                                     }
                             }catch(Exception e){e.printStackTrace();}
@@ -1370,5 +1386,10 @@ public class MainActivity extends AppCompatActivity {
                     }
             }catch(Exception e){e.printStackTrace();}
         }
+    }
+    public static String padString(String str, int leng) {
+        for (int i = str.length(); i <= leng; i++)
+            str += " ";
+        return str;
     }
 }

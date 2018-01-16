@@ -14,4 +14,12 @@
         <item name="android:padding">7dp</item>
         <item name="android:textSize">22sp</item>
     </style>
+
+    <style name="fontForNotificationLandingPage">
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">#FFFF44</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>
