@@ -177,7 +177,6 @@ public class Alarm extends BroadcastReceiver {
     }
 
 
-
     private class AsyncLoader extends AsyncTask<String, Integer, String> {
 
         // static String FILENAME = "test.txt";

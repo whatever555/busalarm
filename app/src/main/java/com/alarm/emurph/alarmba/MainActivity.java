@@ -42,6 +42,7 @@ import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
@@ -59,11 +60,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import java.util.Calendar;
-
 
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
     boolean showLiveData = false;
     public void loadApp(boolean cleanLoad){
 
+
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
         TableLayout liveData = (TableLayout) findViewById(R.id.live_data); liveData.removeAllViews();
 
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         if (!showLiveData){
             liveDataHolder.setVisibility(View.GONE);
         }
-
+        showLiveData = false;
         try {
             jsonArray = new JSONArray(jsonString);
             if (cleanLoad) {
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final JSONObject row = jsonArray.getJSONObject(i);
 
-                String name = row.getString("name");
+                final String name = row.getString("name");
                 final int alarmId = Integer.parseInt(row.getString("alarm_id"));
 
                 // Add the text layout to the parent layout
@@ -197,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
                 int active = Integer.parseInt(row.getString("active"));
                 final Switch activeToggle = (Switch)view.findViewById(R.id.active_toggle);
 
-                if (active == 0)
+                if (active == 0) {
                     activeToggle.setChecked(false);
+                }
 
                 alarmNameText.setText(name);
 
@@ -210,11 +211,13 @@ public class MainActivity extends AppCompatActivity {
                         // do something, the isChecked will be
                         // true if the switch is in the On position
                         toggleActive(alarmId, activeToggle.isChecked());
+                        Toast.makeText(getApplicationContext(), name + (activeToggle.isChecked() ? " enabled" : " disabled"),
+                                Toast.LENGTH_SHORT).show();
                         loadApp(false);
                     }
                 });
 
-                if (alarmData.isActive(row))
+                if (alarmData.isActive(row) && active != 0)
                 {
                     showLiveData=true;
                     final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
