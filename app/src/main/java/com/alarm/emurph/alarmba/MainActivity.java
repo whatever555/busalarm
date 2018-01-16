@@ -320,7 +320,10 @@ public class MainActivity extends AppCompatActivity {
         minsNumPick.setValue(currentMins);
 
         notificationPrelay.setFilters(new InputFilter[]{new InputFilterMinMax("1", "59")});
-        duration.setFilters(new InputFilter[]{new InputFilterMinMax("1", "45")});
+        duration.setFilters(new InputFilter[]{new InputFilterMinMax("01", "99")});
+
+        duration.setText("15");
+        notificationPrelay.setText("05");
 
         minsNumPick.setFormatter(new NumberPicker.Formatter() {
             @Override
@@ -467,14 +470,10 @@ public class MainActivity extends AppCompatActivity {
                                       int before, int count) {
                 try {
                     String stStr = stopNumberText.getText().toString();
-                    System.out.println("String : " + stStr);
                     if (stStr.length() > 0) {
-                        System.out.println("OK : " + stStr);
 
                         if (!stStr.equals("0") && !stStr.equals(stopVal)) {
                             stopVal = stStr;
-
-                            System.out.println("S1 : " + r1 + "+" + r2 + "+" + r3);
 
                             customView.requestLayout();
                             routeSpinner1.setEnabled(false);
@@ -510,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     else {
-                        System.out.println("CANNOT CONVERT ================  : " + stStr);
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -560,10 +558,27 @@ public class MainActivity extends AppCompatActivity {
                 ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
                 repeatToggle.setChecked(row.getString("repeat_toggle").equals("No"));
 
-                duration.setText(row.getString("duration"));
-                notificationPrelay.setText(row.getString("notification_prelay"));
+                String durationStr =  row.getString("duration");
+                while (durationStr.length() < 2){
+                    durationStr = "0"+durationStr;
+                }
+                String prelayStr =  row.getString("notification_prelay");
+                while (prelayStr.length() < 2){
+                    prelayStr = "0"+prelayStr;
+                }
+                duration.setText(durationStr);
+                notificationPrelay.setText(prelayStr);
+
+
                 stopNumberText.setText(row.getString("stop_number"));
-                stopSearchButton.setText(row.getString("stop_number"));
+
+
+                String stpNum = stopNumberText.getText().toString();
+                if (stpNum.length() == 0)
+                {
+                    stpNum = "Search...";
+                }
+                stopSearchButton.setText(stpNum);
                 JSONObject routes = row.getJSONObject("routes");
 
                 r1 = routes.getString("r1").toLowerCase();
@@ -617,7 +632,6 @@ public class MainActivity extends AppCompatActivity {
 
             JSONObject routes = new JSONObject();
 
-            System.out.println("R1 " +r1+" R2 "+r2+" R3 "+r3);
             routes.put("r1",r1);
             routes.put("r2",r2);
             routes.put("r3",r3);
@@ -643,6 +657,7 @@ public class MainActivity extends AppCompatActivity {
                 title = "Notifications for stop: "+stopNumberText.getText();
             }
 
+
             jsonObject.put("alarm_id", Integer.toString(alarmId));
             jsonObject.put("active", name.getTag());
             jsonObject.put("name", title);
@@ -651,8 +666,8 @@ public class MainActivity extends AppCompatActivity {
             jsonObject.put("mins", minsNumPick.getValue());
             jsonObject.put("ampm", ampm.isChecked() ? ampm.getTextOn() : ampm.getTextOff());
             jsonObject.put("repeat_toggle", repeatToggle.isChecked() ? repeatToggle.getTextOn() : repeatToggle.getTextOff());
-            jsonObject.put("duration", duration.getText());
-            jsonObject.put("notification_prelay", notificationPrelay.getText());
+            jsonObject.put("duration", duration.getText().toString());
+            jsonObject.put("notification_prelay", notificationPrelay.getText().toString());
             jsonObject.put("stop_number", stopNumberText.getText());
             jsonObject.put("selected_days", selectedDays);
 
@@ -840,7 +855,6 @@ public class MainActivity extends AppCompatActivity {
                     if (routeList != null)
                         if (routeList.length() > 1) {
                             customView.requestLayout();
-                            System.out.println("ROUTELIST: "+routeList);
                             allBusesDisplay.removeAll(allBusesDisplay);
                             JSONArray stopDataJson = new JSONArray(routeList);
                             if (stopDataJson != null) {
@@ -981,7 +995,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    System.out.println("TEXT CHANGED");
 
                     allStopsDisplay.removeAll(allStopsDisplay);
 
@@ -1123,7 +1136,6 @@ public class MainActivity extends AppCompatActivity {
                     super.onPostExecute(s);
                     if (stopList != null)
                         if (stopList.length() > 1) {
-                            System.out.println("STOPLOST: "+stopList);
 
                             allStopsDisplay.removeAll(allStopsDisplay);
 
@@ -1133,7 +1145,7 @@ public class MainActivity extends AppCompatActivity {
                                     JSONObject jo = ja.getJSONObject(i);
                                     String listText= jo.getString("id");
                                     listText += ": "+jo.getString("name");
-                                    System.out.println(listText);
+
                                     allStopsDisplay.add(listText);
                                 }
                             }
@@ -1363,7 +1375,6 @@ public class MainActivity extends AppCompatActivity {
                     if (jsonBusString.length() > 1) {
                         try {
                             JSONObject routes = this.currentAlarmData.getJSONObject("routes");
-                            System.out.println(routes);
 
                             String route1 = routes.getString("r1");
                             String route2 = routes.getString("r2");

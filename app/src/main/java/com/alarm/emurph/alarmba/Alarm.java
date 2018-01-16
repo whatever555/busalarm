@@ -162,17 +162,18 @@ public class Alarm extends BroadcastReceiver {
             Bundle extras = mIntent.getExtras();
             PugNotification.with(context)
                     .load()
-                    .title("Transport notification")
+                    .title("Leave now notification")
                     .message(message)
                     .bigTextStyle(message)
-                    .smallIcon(R.drawable.pugnotification_ic_launcher)
-                    .largeIcon(R.drawable.pugnotification_ic_launcher)
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
                     .click(MainActivity.class, extras)
                     .color(android.R.color.background_dark)
                     .simple()
                     .build();
-        }catch(Exception e){}
+        }catch(Exception e){
+        }
 
     }
 
@@ -201,7 +202,7 @@ public class Alarm extends BroadcastReceiver {
             try {
                 // Enter URL address where your php file resides
                 url = new URL("https://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation?stopid=" + stopNumber + "&format=json");
-                //url = new URL("https://imaga.me/test.php");
+               // url = new URL("https://imaga.me/test.php");
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -292,7 +293,7 @@ public class Alarm extends BroadcastReceiver {
 
                             String busRoute = row.getString("route");
                             try {
-                                String dt = row.getString("duetime");
+                                String dt = row.getString("duetime").trim();
                                 if (!dt.equals("Due")) {
                                     int duetime = Integer.parseInt(dt);
 

@@ -71,7 +71,7 @@ public class AlarmData {
         try {
             int hrs = Integer.parseInt(currentAlarmData.getString("hrs"));
             int mins = Integer.parseInt(currentAlarmData.getString("mins"));
-            int duration = Integer.parseInt(currentAlarmData.getString("duration"));
+            int duration = Integer.parseInt(currentAlarmData.getString("duration").trim());
             hrs += currentAlarmData.getString("ampm").equals("PM") ? 12 : 0;
 
             int alarmTime = (hrs * 60) + mins;
