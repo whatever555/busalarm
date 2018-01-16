@@ -159,7 +159,7 @@ public class Alarm extends BroadcastReceiver {
         try{
         PugNotification.with(context)
                 .load()
-                .title(message)
+                .title("Transport notification")
                 .message(message)
                 .bigTextStyle(message)
                 .smallIcon(R.drawable.pugnotification_ic_launcher)
