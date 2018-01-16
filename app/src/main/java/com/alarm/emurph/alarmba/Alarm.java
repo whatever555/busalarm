@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.PowerManager;
 
 import org.json.JSONArray;
@@ -157,16 +158,20 @@ public class Alarm extends BroadcastReceiver {
 
     public void sendNotification(Context context, String message) {
         try{
-        PugNotification.with(context)
-                .load()
-                .title("Transport notification")
-                .message(message)
-                .bigTextStyle(message)
-                .smallIcon(R.drawable.pugnotification_ic_launcher)
-                .largeIcon(R.drawable.pugnotification_ic_launcher)
-                .flags(Notification.DEFAULT_ALL)
-                .simple()
-                .build();
+            Intent mIntent = new Intent(context, MainActivity.class);
+            Bundle extras = mIntent.getExtras();
+            PugNotification.with(context)
+                    .load()
+                    .title("Transport notification")
+                    .message(message)
+                    .bigTextStyle(message)
+                    .smallIcon(R.drawable.pugnotification_ic_launcher)
+                    .largeIcon(R.drawable.pugnotification_ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .click(MainActivity.class, extras)
+                    .color(android.R.color.background_dark)
+                    .simple()
+                    .build();
         }catch(Exception e){}
 
     }

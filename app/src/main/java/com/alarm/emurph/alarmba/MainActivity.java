@@ -62,6 +62,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import java.util.Calendar;
+
+
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
 
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        timer = new CountDownTimer(20000, 12) {
+        timer = new CountDownTimer(12000, 5) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -129,22 +132,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 try{
-                    loadApp();
+                    loadApp(false);
                 }catch(Exception e){
                     Log.e("Error", "Error: " + e.toString());
                 }
             }
         }.start();
 
-        loadApp();
+        loadApp(true);
     }
 
     TableLayout liveDataTl;
     ScrollView liveDataHolder;
-    public void loadApp(){
+    boolean showLiveData = false;
+    public void loadApp(boolean cleanLoad){
 
         LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
-        TableLayout liveData = (TableLayout) findViewById(R.id.live_data); alarmListHolder.removeAllViews();
+        TableLayout liveData = (TableLayout) findViewById(R.id.live_data); liveData.removeAllViews();
 
         jsonString = alarmData.readFromFile(this);
 
@@ -154,10 +158,16 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater layoutInflater;
         jsonArray = new JSONArray();
 
+        liveDataHolder = (ScrollView) findViewById(R.id.live_data_holder);
+        if (!showLiveData){
+            liveDataHolder.setVisibility(View.GONE);
+        }
+
         try {
             jsonArray = new JSONArray(jsonString);
-            liveDataHolder = (ScrollView) findViewById(R.id.live_data_holder);
-            liveDataHolder.setVisibility(View.GONE);
+            if (cleanLoad) {
+                liveDataHolder.setVisibility(View.GONE);
+            }
             liveDataTl = (TableLayout) findViewById(R.id.live_data);
             layoutInflater = getLayoutInflater();
 
@@ -200,11 +210,13 @@ public class MainActivity extends AppCompatActivity {
                         // do something, the isChecked will be
                         // true if the switch is in the On position
                         toggleActive(alarmId, activeToggle.isChecked());
+                        loadApp(false);
                     }
                 });
 
                 if (alarmData.isActive(row))
                 {
+                    showLiveData=true;
                     final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
                     final TableLayout Ah = (TableLayout)alarmView.findViewById(R.id.editAlarmHolder);
                     //mainRow.setBackgroundColor(Color.GREEN);
@@ -229,6 +241,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            if(!showLiveData){
+                liveDataHolder.setVisibility(View.GONE);
+            }
+
         }
         catch (JSONException e) {
             System.out.println(e.getMessage());
@@ -288,12 +305,16 @@ public class MainActivity extends AppCompatActivity {
         EditText duration = (EditText) customView.findViewById(R.id.alarm_duration);
         EditText notificationPrelay = (EditText) customView.findViewById(R.id.notification_prelay);
 
+        Calendar rightNow = Calendar.getInstance();
+        int currentHour = rightNow.get(Calendar.HOUR_OF_DAY);
+        int currentMins = rightNow.get(Calendar.MINUTE);
+
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
         hrsNumPick.setMinValue(0);
         hrsNumPick.setMaxValue(11);
-        hrsNumPick.setValue(7);
-        minsNumPick.setValue(30);
+        hrsNumPick.setValue(currentHour);
+        minsNumPick.setValue(currentMins);
 
         notificationPrelay.setFilters(new InputFilter[]{new InputFilterMinMax("1", "59")});
         duration.setFilters(new InputFilter[]{new InputFilterMinMax("1", "45")});
@@ -504,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (saveAlarm(customView, rowToSend)) {
                     mPopupWindow.dismiss();
-                    loadApp();
+                    loadApp(true);
                 }
             }
         });
@@ -520,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         if (alarmData.deleteAlarm(mContext, alarmId)) {
                             mPopupWindow.dismiss();
-                            loadApp();
+                            loadApp(true);
                         }
                     }
                 });
@@ -1332,7 +1353,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-
             try{
                 super.onPostExecute(s);
 
@@ -1362,29 +1382,35 @@ public class MainActivity extends AppCompatActivity {
                                             if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
                                                     TableRow tr = new TableRow(context);
 
-                                                // tv.setText(paddedBusRoute + ""+ paddedStopNumber + ""+  duetime + " mins");
+                                                    String dueString = duetime;
+                                                    if (!dueString.toLowerCase().equals("due"))
+                                                    {
+                                                        dueString+=" mins";
+                                                    }
+                                                // tv.setText(paddedBusRoute + ""+ paddedStopNumber + ""+  dueString);
                                                 RealTimeDisplay rt = new RealTimeDisplay(
                                                         context,
                                                         busRoute,
                                                         stopNumber,
-                                                        duetime + " mins",
+                                                        dueString,
                                                         row.getString("destination")
                                                 );
 
                                                 rt.addToMe(tr);
                                                 liveDataTl.addView(tr);
+                                                showLiveData = true;
                                                 liveDataHolder.setVisibility(View.VISIBLE);
 
-                                                System.out.println("setting");
                                             }
-
-                                        }catch(Exception e){e.printStackTrace();}
+                                        }catch(Exception e){
+                                        }
                                     }
-                            }catch(Exception e){e.printStackTrace();}
+                            }catch(Exception e){}
                             //content.setText(sb.toString());
-                        }catch(Exception e){e.printStackTrace();}
+                        }catch(Exception e){}
                     }
-            }catch(Exception e){e.printStackTrace();}
+                    else {}
+            }catch(Exception e){}
         }
     }
     public static String padString(String str, int leng) {
