@@ -6,8 +6,8 @@ android {
         applicationId "com.alarm.emurph.alarmba"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 12
-        versionName "2"
+        versionCode 14
+        versionName "2.6"
     }
     buildTypes {
         release {

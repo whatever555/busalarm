@@ -311,6 +311,11 @@ public class MainActivity extends AppCompatActivity {
         Calendar rightNow = Calendar.getInstance();
         int currentHour = rightNow.get(Calendar.HOUR_OF_DAY);
         int currentMins = rightNow.get(Calendar.MINUTE);
+        int currentAmpm = rightNow.get(Calendar.AM_PM);
+
+        ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
+        ampm.setChecked(currentAmpm == 1);
+
 
         minsNumPick.setMinValue(0);
         minsNumPick.setMaxValue(59);
@@ -552,7 +557,6 @@ public class MainActivity extends AppCompatActivity {
                 minsNumPick.setValue(Integer.parseInt(row.getString("mins")));
                 hrsNumPick.setValue(Integer.parseInt(row.getString("hrs")));
 
-                ToggleButton ampm = (ToggleButton) customView.findViewById(R.id.ampm);
                 ampm.setChecked(row.getString("ampm").equals("PM"));
 
                 ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
