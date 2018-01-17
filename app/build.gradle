@@ -32,4 +32,5 @@ dependencies {
     compile 'com.github.DavidProdinger:weekdays-selector:1.0.3'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.github.MdFarhanRaja:SearchableSpinner:1.7'
+    compile 'com.google.android.gms:play-services-analytics:10.2.4'
 }

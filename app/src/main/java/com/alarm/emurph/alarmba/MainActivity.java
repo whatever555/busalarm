@@ -46,6 +46,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.dpro.widgets.WeekdaysPicker;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -105,10 +107,16 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray;
     private CountDownTimer timer;
 
+    Tracker mTracker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         alarmData = new AlarmData();
+
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
 
@@ -139,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
         }.start();
 
         loadApp(true);
+
     }
 
     TableLayout liveDataTl;
@@ -235,12 +244,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         openAlarmWindow(row);
+                        mTracker.setScreenName("Open edit alarm");
+                        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                     }
                 });
                 alarmNameText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         openAlarmWindow(row);
+                        mTracker.setScreenName("Open new alarm");
+                        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                     }
                 });
             }
@@ -463,6 +476,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+
             }
 
             @Override
@@ -532,6 +546,9 @@ public class MainActivity extends AppCompatActivity {
                 if (saveAlarm(customView, rowToSend)) {
                     mPopupWindow.dismiss();
                     loadApp(true);
+
+                    mTracker.setScreenName("Save alarm");
+                    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                 }
             }
         });
@@ -548,6 +565,9 @@ public class MainActivity extends AppCompatActivity {
                         if (alarmData.deleteAlarm(mContext, alarmId)) {
                             mPopupWindow.dismiss();
                             loadApp(true);
+
+                            mTracker.setScreenName("Delete alarm");
+                            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                         }
                     }
                 });
@@ -662,6 +682,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
+
             jsonObject.put("alarm_id", Integer.toString(alarmId));
             jsonObject.put("active", name.getTag());
             jsonObject.put("name", title);
@@ -686,11 +707,27 @@ public class MainActivity extends AppCompatActivity {
 
             Alarm alarm = new Alarm();
 
-
-
             alarmData.writeToFile(this, jsonArray.toString());
 
             alarm.setAlarms(this, 0);
+
+            mTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Action")
+                    .setAction("Change stop number")
+                    .setLabel(stopNumberText.getText().toString())
+                    .build());
+
+            mTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Action")
+                    .setAction("Change prelay")
+                    .setLabel(notificationPrelay.getText().toString())
+                    .build());
+
+            mTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Action")
+                    .setAction("Change duration")
+                    .setLabel(duration.getText().toString())
+                    .build());
 
             return true;
 
@@ -714,6 +751,13 @@ public class MainActivity extends AppCompatActivity {
                     else {
                         row.put("active", "0");
                     }
+
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("Action")
+                            .setAction("ToggleAlarm")
+                            .setLabel(isChecked ? "1" : "0")
+                            .build());
+
                     return alarmData.writeToFile(this, jsonArray.toString());
                 }
             }
