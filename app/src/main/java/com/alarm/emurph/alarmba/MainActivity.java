@@ -592,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
                 ampm.setChecked(row.getString("ampm").equals("PM"));
 
                 ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
-                repeatToggle.setChecked(row.getString("repeat_toggle").equals("No"));
+                repeatToggle.setChecked(row.getString("repeat_toggle").equals("On"));
 
                 String durationStr = row.getString("duration");
                 while (durationStr.length() < 2) {
