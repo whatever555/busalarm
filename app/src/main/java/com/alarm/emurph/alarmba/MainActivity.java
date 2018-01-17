@@ -989,7 +989,10 @@ public class MainActivity extends AppCompatActivity {
             stopSearchBox.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                    stopListView.setClickable(false);
+                    stopListView.setEnabled(false);
+                    allStopsDisplay.removeAll(allStopsDisplay);
+                    allStopsDisplay.add("Searching..");
                 }
 
                 @Override
@@ -999,9 +1002,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-
-                    allStopsDisplay.removeAll(allStopsDisplay);
-
                     currentInc++;
                     final int snapInc = currentInc;
                     try {
@@ -1152,6 +1152,9 @@ public class MainActivity extends AppCompatActivity {
 
                                     allStopsDisplay.add(listText);
                                 }
+
+                                stopListView.setClickable(true);
+                                stopListView.setEnabled(true);
                             }
 
                         }
@@ -1245,11 +1248,13 @@ public class MainActivity extends AppCompatActivity {
             searchBox.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                    stopListView.setClickable(false);
+                    stopListView.setEnabled(false);
                 }
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    stopListView = (ListView) v.findViewById(R.id.list);
                 }
 
                 @Override
