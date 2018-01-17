@@ -1,18 +1,26 @@
 package com.alarm.emurph.alarmba;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -72,27 +80,27 @@ import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 public class MainActivity extends AppCompatActivity {
     Context mContext = this;
     int currentInc = 0;
-    Button routeBtn1,routeBtn2,routeBtn3;
+    Button routeBtn1, routeBtn2, routeBtn3;
     String[] stopsList = new String[]{
 
     };
 
     String[] allBusesArray = new String[]{
-            "select","1","1c","4","7","7a","7b","7d","9","11","13","14","14c",
-            "15","15a","15b","15d","16","16c","17","17a","18","25",
-            "25a","25b","25d","25x","26","27","27a","27b","27x","29a",
-            "31","31a","31b","31d","32","32x","33","33a","33b","33d","33x",
-            "37","38","38a","38b","38d","39","39a","39x","40","40b","40d",
-            "41","41a","41b","41c","41x","42","42d","43","44","44b","45a","46a",
-            "46e","47","49","51d","51x","53","54a","56a","59","61","63","65","65b",
-            "66","66a","66b","66x","67","67x","68","68a","68x","69","69x","70","70d",
-            "75","76","76a","77a","77x","79","79a","83","83a","84","84a","84x",
-            "102","104","111","114","116","118","120","122","123","130","140",
-            "142","145","150","151","161","184","185","220","236","238","239",
-            "270","747","757", "red", "green"
+            "select", "1", "1c", "4", "7", "7a", "7b", "7d", "9", "11", "13", "14", "14c",
+            "15", "15a", "15b", "15d", "16", "16c", "17", "17a", "18", "25",
+            "25a", "25b", "25d", "25x", "26", "27", "27a", "27b", "27x", "29a",
+            "31", "31a", "31b", "31d", "32", "32x", "33", "33a", "33b", "33d", "33x",
+            "37", "38", "38a", "38b", "38d", "39", "39a", "39x", "40", "40b", "40d",
+            "41", "41a", "41b", "41c", "41x", "42", "42d", "43", "44", "44b", "45a", "46a",
+            "46e", "47", "49", "51d", "51x", "53", "54a", "56a", "59", "61", "63", "65", "65b",
+            "66", "66a", "66b", "66x", "67", "67x", "68", "68a", "68x", "69", "69x", "70", "70d",
+            "75", "76", "76a", "77a", "77x", "79", "79a", "83", "83a", "84", "84a", "84x",
+            "102", "104", "111", "114", "116", "118", "120", "122", "123", "130", "140",
+            "142", "145", "150", "151", "161", "184", "185", "220", "236", "238", "239",
+            "270", "747", "757", "red", "green"
     };
     String stopVal = "0";
-    String r1 = "select",r2="select",r3 = "select";
+    String r1 = "select", r2 = "select", r3 = "select";
     MySpinnerDialog searchSpinnerDialog;
 
     ArrayList<String> allBuses = new ArrayList<>(Arrays.asList(allBusesArray));
@@ -105,9 +113,20 @@ public class MainActivity extends AppCompatActivity {
     String jsonString;
 
     JSONArray jsonArray;
+    Tracker mTracker;
+    TableLayout liveDataTl;
+    ScrollView liveDataHolder;
+    boolean showLiveData = false;
+    ArrayAdapter<String> stopAdaptor;
+    EditText stopSearchBox;
+    ListView stopListView;
     private CountDownTimer timer;
 
-    Tracker mTracker;
+    public static String padString(String str, int leng) {
+        for (int i = str.length(); i <= leng; i++)
+            str += " ";
+        return str;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +135,6 @@ public class MainActivity extends AppCompatActivity {
 
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
-
-        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        //StrictMode.setThreadPolicy(policy);
 
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -138,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                try{
+                try {
                     loadApp(false);
-                }catch(Exception e){
+                } catch (Exception e) {
                     Log.e("Error", "Error: " + e.toString());
                 }
             }
@@ -148,16 +164,16 @@ public class MainActivity extends AppCompatActivity {
 
         loadApp(true);
 
+
     }
 
-    TableLayout liveDataTl;
-    ScrollView liveDataHolder;
-    boolean showLiveData = false;
-    public void loadApp(boolean cleanLoad){
+    public void loadApp(boolean cleanLoad) {
 
 
-        LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder); alarmListHolder.removeAllViews();
-        TableLayout liveData = (TableLayout) findViewById(R.id.live_data); liveData.removeAllViews();
+        LinearLayout alarmListHolder = (LinearLayout) findViewById(R.id.alarmListHolder);
+        alarmListHolder.removeAllViews();
+        TableLayout liveData = (TableLayout) findViewById(R.id.live_data);
+        liveData.removeAllViews();
 
         jsonString = alarmData.readFromFile(this);
 
@@ -168,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         jsonArray = new JSONArray();
 
         liveDataHolder = (ScrollView) findViewById(R.id.live_data_holder);
-        if (!showLiveData){
+        if (!showLiveData) {
             liveDataHolder.setVisibility(View.GONE);
         }
         showLiveData = false;
@@ -198,13 +214,13 @@ public class MainActivity extends AppCompatActivity {
                 view = layoutInflater.inflate(R.layout.alarm_listing, parentLayout, false);
 
                 // In order to get the view we have to use the new view with text_layout in it
-                LinearLayout alarmView = (LinearLayout)view.findViewById(R.id.alarmView);
+                LinearLayout alarmView = (LinearLayout) view.findViewById(R.id.alarmView);
 
-                TableRow editAlarmTR = (TableRow)view.findViewById(R.id.editAlarmTR);
+                TableRow editAlarmTR = (TableRow) view.findViewById(R.id.editAlarmTR);
                 TextView alarmNameText = (TextView) view.findViewById(R.id.editAlarm);
 
                 int active = Integer.parseInt(row.getString("active"));
-                final Switch activeToggle = (Switch)view.findViewById(R.id.active_toggle);
+                final Switch activeToggle = (Switch) view.findViewById(R.id.active_toggle);
 
                 if (active == 0) {
                     activeToggle.setChecked(false);
@@ -226,11 +242,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                if (alarmData.isActive(row, true))
-                {
-                    showLiveData=true;
-                    final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
-                    final TableLayout Ah = (TableLayout)alarmView.findViewById(R.id.editAlarmHolder);
+                if (alarmData.isActive(row, true)) {
+                    showLiveData = true;
+                    final TableRow mainRow = (TableRow) alarmView.findViewById(R.id.editAlarmTR);
+                    final TableLayout Ah = (TableLayout) alarmView.findViewById(R.id.editAlarmHolder);
                     //mainRow.setBackgroundColor(Color.GREEN);
                     mainRow.setBackgroundColor(Color.parseColor("#e9e9EE"));
                     Ah.setBackgroundColor(Color.parseColor("#e9e9EE"));
@@ -258,24 +273,22 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
-            if(!showLiveData){
+            if (!showLiveData) {
                 liveDataHolder.setVisibility(View.GONE);
             }
 
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             System.out.println(e.getMessage());
         }
         timer.start();
     }
 
     //private method of your class
-    private int getIndex(Spinner spinner, String myString)
-    {
+    private int getIndex(Spinner spinner, String myString) {
         int index = 0;
 
-        for (int i=0;i<spinner.getCount();i++){
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)) {
                 index = i;
                 break;
             }
@@ -283,9 +296,8 @@ public class MainActivity extends AppCompatActivity {
         return index;
     }
 
-
-    public int getCurrentTimestamp(){
-        return  (int) (new Date().getTime()/1000);
+    public int getCurrentTimestamp() {
+        return (int) (new Date().getTime() / 1000);
     }
 
     public void openAlarmWindow(JSONObject row) {
@@ -370,8 +382,6 @@ public class MainActivity extends AppCompatActivity {
         );// With 	Animation
 
 
-
-
         // Get a reference for the custom view close button
         Button closeButton = (Button) customView.findViewById(R.id.cancel_button);
         // Get a reference for the custom view save button
@@ -389,12 +399,12 @@ public class MainActivity extends AppCompatActivity {
         routeBtn3 = (Button) customView.findViewById(R.id.route3_button);
 
         //searchSpinnerDialog=new MYSpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",mContext);// With No Animation
-        searchSpinnerDialog=new MySpinnerDialog(MainActivity.this,allStopsDisplay,"Search for stop",R.style.DialogAnimations_SmileWindow,mContext);// With 	Animation
+        searchSpinnerDialog = new MySpinnerDialog(MainActivity.this, allStopsDisplay, "Search for stop", R.style.DialogAnimations_SmileWindow, mContext);// With 	Animation
 
 
-        if (!isNetworkAvailable()){
+        if (!isNetworkAvailable()) {
             stopSearchButton.setVisibility(View.GONE);
-        }else{
+        } else {
             stopNumberText.setVisibility(View.GONE);
         }
         routeSpinner1.bindOnSpinerListener(new OnSpinerItemClick() {
@@ -422,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
         searchSpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
             public void onClick(String item, int position) {
-                String[] stopData=item.split(":");
+                String[] stopData = item.split(":");
                 stopNumberText.setText(stopData[0]);
                 stopSearchButton.setText(stopData[0]);
             }
@@ -435,6 +445,9 @@ public class MainActivity extends AppCompatActivity {
                 InputMethodManager keyboard = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
                 keyboard.showSoftInput(customView, 0);
+
+                GPSAutoFill gpsA = new GPSAutoFill(mContext);
+                gpsA.execute();
             }
         });
         // Set a click listener for the popup window close button
@@ -470,71 +483,70 @@ public class MainActivity extends AppCompatActivity {
         //TODO should this be commented out
         //allBusesDisplay.addAll(allBusesDisplay);
         try {
-        stopVal = (row == null) ? "0" : row.getString("stop_number");
+            stopVal = (row == null) ? "0" : row.getString("stop_number");
 
-        stopNumberText.addTextChangedListener(new TextWatcher() {
+            stopNumberText.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                @Override
+                public void afterTextChanged(Editable s) {
 
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
-                try {
-                    String stStr = stopNumberText.getText().toString();
-                    if (stStr.length() > 0) {
-
-                        if (!stStr.equals("0") && !stStr.equals(stopVal)) {
-                            stopVal = stStr;
-
-                            customView.requestLayout();
-                            routeSpinner1.setEnabled(false);
-                            routeSpinner2.setEnabled(false);
-                            routeSpinner3.setEnabled(false);
-                            routeSpinner1.setClickable(false);
-                            routeSpinner2.setClickable(false);
-                            routeSpinner3.setClickable(false);
-
-                            saveButton.setEnabled(false);
-                            saveButton.setClickable(false);
-
-                            customView.requestLayout();
-
-                            allBusesDisplay.removeAll(allBusesDisplay);
-
-                            customView.requestLayout();
-                            currentInc++;
-                            final int snapInc = currentInc;
-                            try {
-                                if (s.length() > 0) {
-                                    RouteLister RL = new RouteLister(
-                                            mContext,
-                                            stopNumberText.getText().toString(),
-                                            customView,
-                                            snapInc
-                                    );
-                                    RL.execute();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    else {
-                    }
-                }catch(Exception e){
-                    e.printStackTrace();
                 }
-            }
-        });
-    }catch (Exception e){
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start,
+                                              int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start,
+                                          int before, int count) {
+                    try {
+                        String stStr = stopNumberText.getText().toString();
+                        if (stStr.length() > 0) {
+
+                            if (!stStr.equals("0") && !stStr.equals(stopVal)) {
+                                stopVal = stStr;
+
+                                customView.requestLayout();
+                                routeSpinner1.setEnabled(false);
+                                routeSpinner2.setEnabled(false);
+                                routeSpinner3.setEnabled(false);
+                                routeSpinner1.setClickable(false);
+                                routeSpinner2.setClickable(false);
+                                routeSpinner3.setClickable(false);
+
+                                saveButton.setEnabled(false);
+                                saveButton.setClickable(false);
+
+                                customView.requestLayout();
+
+                                allBusesDisplay.removeAll(allBusesDisplay);
+
+                                customView.requestLayout();
+                                currentInc++;
+                                final int snapInc = currentInc;
+                                try {
+                                    if (s.length() > 0) {
+                                        RouteLister RL = new RouteLister(
+                                                mContext,
+                                                stopNumberText.getText().toString(),
+                                                customView,
+                                                snapInc
+                                        );
+                                        RL.execute();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else {
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -582,24 +594,21 @@ public class MainActivity extends AppCompatActivity {
                 ToggleButton repeatToggle = (ToggleButton) customView.findViewById(R.id.repeat_toggle);
                 repeatToggle.setChecked(row.getString("repeat_toggle").equals("No"));
 
-                String durationStr =  row.getString("duration");
-                while (durationStr.length() < 2){
-                    durationStr = "0"+durationStr;
+                String durationStr = row.getString("duration");
+                while (durationStr.length() < 2) {
+                    durationStr = "0" + durationStr;
                 }
-                String prelayStr =  row.getString("notification_prelay");
-                while (prelayStr.length() < 2){
-                    prelayStr = "0"+prelayStr;
+                String prelayStr = row.getString("notification_prelay");
+                while (prelayStr.length() < 2) {
+                    prelayStr = "0" + prelayStr;
                 }
                 duration.setText(durationStr);
                 notificationPrelay.setText(prelayStr);
 
-
                 stopNumberText.setText(row.getString("stop_number"));
 
-
                 String stpNum = stopNumberText.getText().toString();
-                if (stpNum.length() == 0)
-                {
+                if (stpNum.length() == 0) {
                     stpNum = "Search...";
                 }
                 stopSearchButton.setText(stpNum);
@@ -624,25 +633,23 @@ public class MainActivity extends AppCompatActivity {
                     selectedDaysInts.add(Integer.valueOf(day));
                 }
                 widget.setSelectedDays(selectedDaysInts);
+            } catch (JSONException e) {
+                System.out.println(e.getMessage());
             }
-            catch(JSONException e){
-            System.out.println(e.getMessage());
-        }
-    }
-    else
-        {
+        } else {
             stopNumberText.setText("");
         }
-        mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER,0,0);
+        mPopupWindow.showAtLocation(parentLayout, Gravity.CENTER, 0, 0);
     }
 
-    public void reloadApp(){
+    public void reloadApp() {
         Intent intent = getIntent();
         finish();
         startActivity(intent);
     }
+
     public boolean saveAlarm(View customView, JSONObject row) {
-        try{
+        try {
             JSONObject jsonObject = new JSONObject();
 
             EditText name = (EditText) customView.findViewById(R.id.name);
@@ -656,9 +663,9 @@ public class MainActivity extends AppCompatActivity {
 
             JSONObject routes = new JSONObject();
 
-            routes.put("r1",r1);
-            routes.put("r2",r2);
-            routes.put("r3",r3);
+            routes.put("r1", r1);
+            routes.put("r2", r2);
+            routes.put("r3", r3);
 
             WeekdaysPicker widget = (WeekdaysPicker) customView.findViewById(R.id.weekdays);
             List<Integer> selectedDaysList = widget.getSelectedDays();
@@ -668,19 +675,16 @@ public class MainActivity extends AppCompatActivity {
             int alarmId;
             if (row == null) {
                 alarmId = getCurrentTimestamp();
-            }
-            else {
+            } else {
                 alarmId = Integer.parseInt(row.getString("alarm_id"));
                 jsonArray.remove(alarmData.getAlarmIndex(this, alarmId));
-              //  alarmData.deleteAlarm(this, alarmId);
+                //  alarmData.deleteAlarm(this, alarmId);
             }
 
             String title = name.getText().toString();
-            if(name.length() == 0)
-            {
-                title = "Notifications for stop: "+stopNumberText.getText();
+            if (name.length() == 0) {
+                title = "Notifications for stop: " + stopNumberText.getText();
             }
-
 
 
             jsonObject.put("alarm_id", Integer.toString(alarmId));
@@ -702,7 +706,7 @@ public class MainActivity extends AppCompatActivity {
             int hrs = hrsNumPick.getValue();
 
             if (ampm.isChecked()) {
-                hrs+=12;
+                hrs += 12;
             }
 
             Alarm alarm = new Alarm();
@@ -728,8 +732,7 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
 
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -739,13 +742,10 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 final JSONObject row = jsonArray.getJSONObject(i);
-                if(Integer.toString(alarmId).equals(row.getString("alarm_id")))
-                {
-                    if (isChecked)
-                    {
+                if (Integer.toString(alarmId).equals(row.getString("alarm_id"))) {
+                    if (isChecked) {
                         row.put("active", "1");
-                    }
-                    else {
+                    } else {
                         row.put("active", "0");
                     }
 
@@ -757,8 +757,7 @@ public class MainActivity extends AppCompatActivity {
 
                     return alarmData.writeToFile(this, jsonArray.toString());
                 }
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -788,7 +787,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     private class RouteLister extends AsyncTask<String, Integer, String> {
 
@@ -802,7 +806,7 @@ public class MainActivity extends AppCompatActivity {
         String routeList = "";
         ArrayAdapter<String> spinnerData;
         View customView;
-        int snapInc=0;
+        int snapInc = 0;
 
         public RouteLister(
                 Context context,
@@ -810,8 +814,8 @@ public class MainActivity extends AppCompatActivity {
                 View customView,
                 int snapInc) {
             super();
-            this.snapInc=snapInc;
-            this.customView=customView;
+            this.snapInc = snapInc;
+            this.customView = customView;
             this.context = context;
             this.spinnerData = spinnerData;
             this.stopNumber = stopNumber;
@@ -905,11 +909,11 @@ public class MainActivity extends AppCompatActivity {
                             if (stopDataJson != null) {
                                 JSONArray ja = stopDataJson.getJSONArray(0);
                                 if (ja != null)
-                                for (int i = 0; i < ja.length(); i++) {
-                                    customView.requestLayout();
-                                    String valueString = ja.get(i).toString();
-                                    allBusesDisplay.add(valueString);
-                                }
+                                    for (int i = 0; i < ja.length(); i++) {
+                                        customView.requestLayout();
+                                        String valueString = ja.get(i).toString();
+                                        allBusesDisplay.add(valueString);
+                                    }
                             }
 
                         }
@@ -959,9 +963,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    ArrayAdapter<String> stopAdaptor;
-    EditText stopSearchBox;
-    ListView stopListView;
     private class MySpinnerDialog {
         Activity context;
         String dTitle;
@@ -1019,7 +1020,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
                     onSpinerItemClick.onClick(t.getText().toString(), pos);
@@ -1073,7 +1074,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private class StopLister extends AsyncTask<String, Integer, String> {
 
         // static String FILENAME = "test.txt";
@@ -1084,7 +1084,7 @@ public class MainActivity extends AppCompatActivity {
         int READ_TIMEOUT = 2200;
         int CONNECTION_TIMEOUT = 2200;
         String stopList = "";
-        int snapInc=0;
+        int snapInc = 0;
         View v;
 
         public StopLister(
@@ -1093,8 +1093,8 @@ public class MainActivity extends AppCompatActivity {
                 int snapInc,
                 View v) {
             super();
-            this.v=v;
-            this.snapInc=snapInc;
+            this.v = v;
+            this.snapInc = snapInc;
             this.context = context;
             this.searchText = searchText;
         }
@@ -1188,8 +1188,8 @@ public class MainActivity extends AppCompatActivity {
                             if (ja != null) {
                                 for (int i = 0; i < ja.length(); i++) {
                                     JSONObject jo = ja.getJSONObject(i);
-                                    String listText= jo.getString("id");
-                                    listText += ": "+jo.getString("name");
+                                    String listText = jo.getString("id");
+                                    listText += ": " + jo.getString("name");
 
                                     allStopsDisplay.add(listText);
                                 }
@@ -1213,7 +1213,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
     private class RouteSpinnerDialog {
         Activity context;
         String dTitle;
@@ -1233,16 +1232,16 @@ public class MainActivity extends AppCompatActivity {
             this.style = style;
         }
 
-        public void setEnabled(boolean b){
+        public void setClickable(boolean b) {
 
         }
 
-        public void setClickable(boolean b){
-
-        }
-
-        public boolean isEnabled(){
+        public boolean isEnabled() {
             return true;
+        }
+
+        public void setEnabled(boolean b) {
+
         }
 
         public void bindOnSpinerListener(OnSpinerItemClick onSpinerItemClick1) {
@@ -1276,7 +1275,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     onSpinerItemClick.onClick(t.getText().toString(), pos);
 
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
                     alertDialog.dismiss();
@@ -1315,16 +1314,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-
-
-
     private class AsyncLoader extends AsyncTask<String, Integer, String> {
 
         // static String FILENAME = "test.txt";
@@ -1339,7 +1328,7 @@ public class MainActivity extends AppCompatActivity {
 
         public AsyncLoader(Context context, String stopNumber, JSONObject currentAlarmData) {
             super();
-            this.currentAlarmData=currentAlarmData;
+            this.currentAlarmData = currentAlarmData;
             this.context = context;
             this.stopNumber = stopNumber;
 
@@ -1394,8 +1383,7 @@ public class MainActivity extends AppCompatActivity {
                         jsonBusString = result.toString();
                         // Pass data to onPostExecute method
                         return (result.toString());
-                    }
-                    catch(Exception e) {
+                    } catch (Exception e) {
 
                         return ("unsuccessful");
                     }
@@ -1405,7 +1393,7 @@ public class MainActivity extends AppCompatActivity {
                     return ("unsuccessful");
                 }
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 //sendNotification(context, "ERROR 4" +  e.getClass().getSimpleName());
                 //e.printStackTrace();
 
@@ -1418,7 +1406,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            try{
+            try {
                 super.onPostExecute(s);
 
                 if (jsonBusString != null)
@@ -1444,13 +1432,12 @@ public class MainActivity extends AppCompatActivity {
                                             String duetime = row.getString("duetime");
 
                                             if (allRoutes || (busRoute.equals(route1) || busRoute.equals(route2) || busRoute.equals(route3))) {
-                                                    TableRow tr = new TableRow(context);
+                                                TableRow tr = new TableRow(context);
 
-                                                    String dueString = duetime;
-                                                    if (!dueString.toLowerCase().equals("due"))
-                                                    {
-                                                        dueString+=" mins";
-                                                    }
+                                                String dueString = duetime;
+                                                if (!dueString.toLowerCase().equals("due")) {
+                                                    dueString += " mins";
+                                                }
                                                 // tv.setText(paddedBusRoute + ""+ paddedStopNumber + ""+  dueString);
                                                 RealTimeDisplay rt = new RealTimeDisplay(
                                                         context,
@@ -1466,20 +1453,173 @@ public class MainActivity extends AppCompatActivity {
                                                 liveDataHolder.setVisibility(View.VISIBLE);
 
                                             }
-                                        }catch(Exception e){
+                                        } catch (Exception e) {
                                         }
                                     }
-                            }catch(Exception e){}
+                            } catch (Exception e) {
+                            }
                             //content.setText(sb.toString());
-                        }catch(Exception e){}
+                        } catch (Exception e) {
+                        }
+                    } else {
                     }
-                    else {}
-            }catch(Exception e){}
+            } catch (Exception e) {
+            }
         }
     }
-    public static String padString(String str, int leng) {
-        for (int i = str.length(); i <= leng; i++)
-            str += " ";
-        return str;
+
+    private class GPSAutoFill extends AsyncTask<String, Integer, String> {
+
+        // static String FILENAME = "test.txt";
+        HttpURLConnection conn;
+        URL url;
+        Context context;
+        int READ_TIMEOUT = 2200;
+        int CONNECTION_TIMEOUT = 2200;
+        String jString;
+        JSONObject jObject;
+        double lng;
+        double lat;
+        boolean premOk = false;
+        LocationManager mLocationManager;
+        Location myLocation;
+
+        public GPSAutoFill(Context context) {
+            super();
+            this.context = context;
+
+        }
+
+        private Location getLastKnownLocation() {
+
+            String permission1 = android.Manifest.permission.ACCESS_FINE_LOCATION;
+            int premOk1 = context.checkCallingOrSelfPermission(permission1);
+
+            String permission2 = Manifest.permission.ACCESS_COARSE_LOCATION;
+            int premOk2 = context.checkCallingOrSelfPermission(permission2);
+
+            if (premOk1 == PackageManager.PERMISSION_GRANTED && premOk2 == PackageManager.PERMISSION_GRANTED) {
+                premOk = true;
+                mLocationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+                List<String> providers = mLocationManager.getProviders(true);
+                Location bestLocation = null;
+                for (String provider : providers) {
+                    Location l = mLocationManager.getLastKnownLocation(provider);
+                    if (l == null) {
+                        continue;
+                    }
+                    if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                        // Found best last known location: %s", l);
+                        bestLocation = l;
+                    }
+                }
+                return bestLocation;
+            }
+            return null;
+        }
+
+        @Override
+        protected String doInBackground(String... str) {
+
+                try {
+                    myLocation = getLastKnownLocation();
+                    // Enter URL address where your php file resides
+                    url = new URL("https://tippit.eu/nearby?lg=" + myLocation.getLongitude() + "&lt=" + myLocation.getLatitude());
+                    //url = new URL("https://imaga.me/test.php");
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+
+                    return e.toString();
+                }
+                try {
+
+                    // Setup HttpURLConnection class to send and receive data from php
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(READ_TIMEOUT);
+                    conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                    conn.setRequestMethod("GET");
+
+                    // setDoOutput to true as we recieve data from json file
+                    conn.setDoOutput(false);
+
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+
+                    return "";
+                }
+
+                try {
+                    int response_code = conn.getResponseCode();
+
+                    // Check if successful connection made
+                    if (response_code == HttpURLConnection.HTTP_OK) {
+                        try {
+                            // Read data sent from server
+                            InputStream input = conn.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                            StringBuilder result = new StringBuilder();
+                            String line;
+
+                            while ((line = reader.readLine()) != null) {
+                                result.append(line);
+                            }
+
+                            jString = result.toString();
+                            // Pass data to onPostExecute method
+                            return (result.toString());
+                        } catch (Exception e) {
+                            return ("unsuccessful");
+                        }
+                    } else {
+                        return ("unsuccessful");
+                    }
+
+                } catch (Exception e) {
+
+                    return "";
+                } finally {
+                    conn.disconnect();
+                }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (premOk && allStopsDisplay.size()<2) {
+                try {
+                    super.onPostExecute(s);
+                    if (jString != null)
+                        if (jString.length() > 1) {
+
+                            allStopsDisplay.removeAll(allStopsDisplay);
+
+                            JSONArray ja = new JSONArray(jString);
+                            if (ja != null) {
+                                for (int i = 0; i < ja.length(); i++) {
+                                    JSONObject jo = ja.getJSONObject(i);
+                                    String listText = jo.getString("id");
+                                    listText += ": " + jo.getString("name");
+
+                                    allStopsDisplay.add(listText);
+                                }
+
+                                stopListView.setClickable(true);
+                                stopListView.setEnabled(true);
+                            }
+
+                        }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    stopListView.setAdapter(stopAdaptor);
+
+                    stopListView.requestLayout();
+                    //stopAdaptor.getFilter().filter(stopSearchBox.getText().toString());
+                    //view.requestLayout();
+                }
+            }
+        }
     }
 }
