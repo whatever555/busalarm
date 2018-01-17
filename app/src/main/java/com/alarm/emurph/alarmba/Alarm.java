@@ -41,12 +41,8 @@ public class Alarm extends BroadcastReceiver {
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
-            // setAlarms(context);
-
             wl.acquire();
 
-            // Put here YOUR code.
-            //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
             String name; int requestCode = 0;
             try {
                 requestCode = intent.getIntExtra("requestCode", 0);
@@ -64,10 +60,8 @@ public class Alarm extends BroadcastReceiver {
                     }
                 }
 
-                if (alarmData.isActive(currentAlarmData)) {
+                if (alarmData.isActive(currentAlarmData, false)) {
                     try {
-                        //    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                        //    StrictMode.setThreadPolicy(policy);
 
                         String stopNumber = currentAlarmData.getString("stop_number");
 

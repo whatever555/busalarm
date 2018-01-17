@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                if (alarmData.isActive(row) && active != 0)
+                if (alarmData.isActive(row, true))
                 {
                     showLiveData=true;
                     final TableRow mainRow = (TableRow)alarmView.findViewById(R.id.editAlarmTR);
@@ -712,21 +712,18 @@ public class MainActivity extends AppCompatActivity {
             alarm.setAlarms(this, 0);
 
             mTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Action")
-                    .setAction("Change stop number")
-                    .setLabel(stopNumberText.getText().toString())
+                    .setCategory("SaveStopNumber")
+                    .setAction(stopNumberText.getText().toString())
                     .build());
 
             mTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Action")
-                    .setAction("Change prelay")
-                    .setLabel(notificationPrelay.getText().toString())
+                    .setCategory("SavePrelay")
+                    .setAction(notificationPrelay.getText().toString())
                     .build());
 
             mTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Action")
-                    .setAction("Change duration")
-                    .setLabel(duration.getText().toString())
+                    .setCategory("SaveDuration")
+                    .setAction(duration.getText().toString())
                     .build());
 
             return true;

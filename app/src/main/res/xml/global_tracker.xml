@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="UA-112640142-1" translatable="false">${YOUR_TRACKING_ID}</string>
+    <string name="ga_trackingId" translatable="false">UA-112640142-1</string>
 </resources>

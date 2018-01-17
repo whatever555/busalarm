@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -60,7 +59,7 @@ public class AlarmData {
         return ret;
     }
 
-    public boolean isActive(JSONObject currentAlarmData)
+    public boolean isActive(JSONObject currentAlarmData, boolean ignoreActiveToggle)
     {
         Date now = new Date();
 
@@ -82,6 +81,10 @@ public class AlarmData {
             int calendarTime = (nowHour * 60) + nowMinute;
 
             int active = Integer.parseInt(currentAlarmData.getString("active"));
+
+            if (ignoreActiveToggle){
+                active = 1;
+            }
 
             return currentAlarmData.getString("selected_days").
                     contains(Integer.toString(currentDayInt))
